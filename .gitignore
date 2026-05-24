@@ -1,0 +1,41 @@
+# Data and outputs
+/data/
+/outputs/
+*.nc
+*.zarr
+*.zarr/
+*.grib
+*.grib2
+*.hdf5
+*.h5
+
+# Logs
+*.log
+
+# Credentials
+.env
+.cdsapirc
+.netrc
+.edl_token
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.python-version
+
+# uv
+uv.lock
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

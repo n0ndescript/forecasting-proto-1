@@ -1,0 +1,72 @@
+[project]
+name = "monsoon-bias"
+version = "0.1.0"
+description = "Diagnostic pipeline for evaluating bias in AI weather model rainfall forecasts over the Indian monsoon region."
+requires-python = ">=3.11,<3.12"
+authors = [{ name = "Siddharth Vijayakrishnan" }]
+readme = "README.md"
+
+# CPU-only base: everything needed for downloading data, regridding,
+# analysis, and plotting. The GPU-bound forecast step (Earth2Studio +
+# AIFS) lives in the [gpu] extra so this base install works on a laptop.
+dependencies = [
+    "xarray>=2024.1.0",
+    "zarr>=3.1",
+    "numpy>=1.26",
+    "pandas>=2.0",
+    "netcdf4>=1.6",
+    "h5py>=3.10",
+    "h5netcdf>=1.3",
+    "scipy>=1.11",
+    "dask[complete]>=2024.1.0",
+    "cdsapi>=0.7.4",
+    "earthaccess>=0.10.0",
+    "cartopy>=0.22",
+    "matplotlib>=3.8",
+    "cmocean>=3.0",
+    "scoringrules>=0.5",
+    "python-dotenv>=1.0",
+    "tqdm>=4.66",
+    "requests>=2.31",
+    "xarray-regrid>=0.4.2",
+]
+
+[project.optional-dependencies]
+# Install on the RunPod H100 box for the forecast step.
+# torch is intentionally unpinned w.r.t. CUDA version — install the
+# matching wheel manually on the GPU host before `uv sync --extra gpu`.
+gpu = [
+    "torch>=2.7,<2.9",                # match prebuilt flash_attn wheels
+    "earth2studio[aifs]>=0.14.0",     # 0.14 has lexicons + AIFS-native tp06
+]
+dev = [
+    "jupyter",
+    "ipykernel",
+    "ruff",
+    "pytest",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/monsoon_bias"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+# earth2studio[aifs] pulls flash-attn as a hard dep. flash-attn's own
+# setup.py imports torch at build time, so uv's build isolation doesn't
+# work — we have to mirror earth2studio's own pyproject and tell uv to
+# build flash-attn (and friends) without isolation, exposing torch +
+# build helpers from the parent env.
+[tool.uv]
+no-build-isolation-package = ["flash-attn", "earth2grid", "natten", "torch-harmonics"]
+
+[tool.uv.extra-build-dependencies]
+flash-attn = ["torch", "packaging", "ninja", "wheel"]
+earth2grid = ["setuptools", "torch"]
+natten = ["setuptools", "cmake", "torch"]
+torch-harmonics = ["setuptools", "torch"]
