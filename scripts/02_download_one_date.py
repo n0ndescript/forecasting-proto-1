@@ -83,32 +83,34 @@ def fetch_era5() -> xr.DataArray:
 
 
 def fetch_aifs() -> xr.DataArray | None:
-    """Run AIFS if a GPU is available; otherwise skip with a clear note."""
+    """Use the cached AIFS forecast if present; else run on GPU; else skip."""
     _step("AIFS forecast")
-    try:
-        import torch  # noqa: F401
-    except ImportError:
-        print("  Skipped — torch not installed. Install with `uv sync --extra gpu` on the GPU host.")
-        return None
-
-    import torch
-    if not torch.cuda.is_available():
-        print("  Skipped — no CUDA device. Re-run on the H100 host or set up "
-              "torch with CUDA locally.")
-        return None
-
     try:
         from monsoon_bias.forecast import run_aifs
     except ImportError as exc:
         print(f"  Skipped — earth2studio not installed: {exc}")
         return None
 
-    print(f"  Running AIFS for verifying date {VERIFYING_DATE.date()} "
-          f"(init {run_aifs.init_time_for_verifying_date(VERIFYING_DATE)})...")
-    fcst_path = run_aifs.run_aifs_forecast(VERIFYING_DATE)
+    init = run_aifs.init_time_for_verifying_date(VERIFYING_DATE)
+    nsteps = run_aifs.nsteps_for_lead()
+    cached = (config.FORECAST_DIR /
+              f"aifs_{init.strftime('%Y%m%dT%H%M')}_nsteps{nsteps}.nc")
+    if cached.exists() and cached.stat().st_size >= 1_000_000:
+        print(f"  Cache hit: {cached.name} ({cached.stat().st_size / 1e9:.1f} GB) — no GPU needed.")
+        fcst_path = cached
+    else:
+        try:
+            import torch
+        except ImportError:
+            print("  Skipped — torch not installed and no cached forecast.")
+            return None
+        if not torch.cuda.is_available():
+            print("  Skipped — no CUDA device and no cached forecast.")
+            return None
+        print(f"  Running AIFS for verifying date {VERIFYING_DATE.date()} (init {init})...")
+        fcst_path = run_aifs.run_aifs_forecast(VERIFYING_DATE)
     print(f"  Got {fcst_path.name}; extracting IMD-day rainfall...")
     ds = xr.open_dataset(fcst_path)
-    init = run_aifs.init_time_for_verifying_date(VERIFYING_DATE)
     da = accumulate.accumulate_aifs_to_imd_day(ds, VERIFYING_DATE, init_time=init)
     print(f"  OK — AIFS mean over India: {float(da.mean()):.2f} mm/day, "
           f"max: {float(da.max()):.1f} mm/day")

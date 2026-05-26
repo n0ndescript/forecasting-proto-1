@@ -1,18 +1,22 @@
 # Monsoon Bias Prototype — Session Status
 
-Snapshot as of 2026-05-21.
+Snapshot as of 2026-05-25.
 
 ## What's working end-to-end
 
 | Script | Status | What it does |
 |---|---|---|
 | `scripts/01_test_credentials.py` | runs on laptop | Downloads 1 day of ERA5 t2m + 1 day IMERG daily, plots on India map |
-| `scripts/02_download_one_date.py` | runs on laptop *except* AIFS step | Full one-date pipeline: IMERG half-hourly → mm/day, ERA5 hourly tp → mm/day, conservative regrid, bias plot |
-| `scripts/03-06` | stubs | Not yet implemented |
+| `scripts/02_download_one_date.py` | **green end-to-end** (cache-aware: needs GPU only if forecast NetCDF absent) | Full one-date pipeline: IMERG half-hourly → mm/day, ERA5 hourly tp → mm/day, AIFS 96-h → 4 × tp06 → mm/day, conservative regrid, 3-panel + bias plot |
+| `scripts/03_download_all.py` | implemented; not yet exercised at full scale | Batch IMERG + ERA5 for the season, populates the Zarr store, resumable |
+| `scripts/04_run_forecasts.py` | implemented; needs GPU pod | 122 AIFS forecasts with per-forecast trim built in (7.2 GB → 36 MB) |
+| `scripts/05_compute_bias.py` | stub | Mean bias, RMSE, elevation/region/rainfall-magnitude stratifications |
+| `scripts/06_make_plots.py` | stub | Six publication-quality Cartopy figures |
+| `scripts/test_trim.py` | one-shot validator | Bytes-compares trimmed vs untrimmed accumulator output |
 
 All `src/monsoon_bias/` modules either implemented or have detailed docstring stubs:
 
-- **Implemented:** `config.py`, `data/_earthdata.py`, `data/imerg.py`, `data/era5.py`, `processing/accumulate.py`, `processing/regrid.py`, `forecast/run_aifs.py` (untestable without GPU but written against confirmed Earth2Studio 0.14.0 API)
+- **Implemented:** `config.py`, `data/_earthdata.py`, `data/imerg.py`, `data/era5.py`, `processing/accumulate.py`, `processing/regrid.py`, `forecast/run_aifs.py`, `forecast/trim.py`
 - **Stubbed:** `data/bsiso.py`, `data/elevation.py`, `processing/store.py`, `analysis/bias.py`, `analysis/plots.py`
 
 ## Concrete results
@@ -126,41 +130,55 @@ confirm — these are the things doc-reading can't tell you:
    (Earth2Studio regrids AIFS's internal O96 reduced Gaussian). Our
    accumulator + regridder assume this; verify shape and coord values.
 
-## Resume checklist (paused 2026-05-22 PM, pod stopped)
+## Session log — 2026-05-25 (CPU pod, B2 fixed, trim built)
 
-### Where things stand at the end of this session
+GPU was unavailable on resume; ran on a CPU pod for the day. **B2 is green.**
 
-- **Pod environment: working** with earth2studio 0.14.0 + torch 2.8.0+cu128 + flash_attn 2.8.3. Resolved during the session:
-  - Pulled `nvidia-cusparselt-cu12` + correct `nvidia-nccl-cu12` via an atomic `uv pip install --reinstall torch==2.8.0 --index-url ...cu128` (uv sync alone left an inconsistent CUDA stack).
-  - Added `[tool.uv]` block to `pyproject.toml` for `no-build-isolation-package = ["flash-attn", ...]` and `[tool.uv.extra-build-dependencies]` so flash-attn doesn't get rebuilt from source on every sync.
-- **ARCO path verified end-to-end through inference.** 90 inputs fetched in ~40 s, 17 steps inferred in ~50 s on H100 SXM, 7.2 GB NetCDF written.
-- **`_lexicon_patch.py` still required for ARCO**: v0.14.0's ARCO lexicon is missing 5 surface vars (`tcw, swvl1, swvl2, stl1, stl2`). Patch is now re-enabled in `run_aifs.py`.
-- **Accumulator bug fixed in source**: now accepts empty units attribute (AIFS v0.14's `tp06` has no `units` attr; ECMWF convention is meters).
-- **B2 *still not green*** — one remaining accumulator issue:
-  - `ValueError: AIFS output missing steps [..09:00, ..15:00, ..21:00, ..+1d 03:00] required ... Available: [Timestamp('2025-07-12 03:00:00')]`
-  - AIFS NetCDF on pod has all 16 forecast steps' worth of data (7.2 GB), but the accumulator is reading them under the wrong coordinate. Earth2Studio 0.14's `NetCDF4Backend` likely stores forecast steps along a `lead_time` dim (or `time` is the init only) — accumulator currently looks for absolute valid-time stamps in `time`.
+### What got done
 
-### Next session — first task
+1. **Inspected AIFS NetCDF layout.** Earth2Studio 0.14 emits `(time=[init], lead_time=[0, 6h, …, 96h], lat, lon)` with `tp06` per step. Init is in `time`, not a per-step absolute valid timestamp.
+2. **Fixed `accumulate_aifs_to_imd_day`** (`src/monsoon_bias/processing/accumulate.py`) to handle both layouts: new `lead_time`-aware path (selects leads 78/84/90/96 h after asserting init matches), with the old absolute-valid-time path kept as fallback for older serializations.
+3. **Made script 02 cache-aware** (`scripts/02_download_one_date.py`): if `data/forecasts/aifs_<init>_nsteps16.nc` already exists and is ≥1 MB, use it without requiring CUDA. Lets B2 run end-to-end on a CPU pod.
+4. **B2 verified.** Script 02 produced `outputs/figures/02_one_date_2025-07-15.png`. IMERG 7.48 / ERA5 7.76 / AIFS 8.88 mm/day mean over India. Bias maps show the expected geographically-coherent structure — AIFS dry over central/eastern India, wet over NW Pakistan and the western Himalayan foothills.
+5. **Built `forecast/trim.py`.** `trim_aifs_forecast(in_path, out_path=None, delete_source=False)` keeps only `tp06`, zlib level 4, atomic temp-file + `os.replace`, validates round-trip before commit. Sanity guards: trimmed size must be in [1 MB, 500 MB].
+6. **Validated trim** with `scripts/test_trim.py` against the real 6.8 GB cached forecast: trimmed to **36 MB (193× smaller)**, IMD-day totals are bytes-identical. **122 forecasts → ~4.5 GB instead of ~880 GB.**
+7. **Integrated trim into script 04** batch loop. Trim failures don't abort the batch — they log "TRIM-FAIL" and leave the untrimmed file in place for a later sweep.
 
-1. **Resume pod**, get new SSH info.
-2. **Inspect the AIFS NetCDF dim structure** (~30 s):
+### Still untested (low risk)
+
+- **In-place trim path** (`out_path == in_path`, atomic replace). Side-file path is bytes-validated; the in-place path adds only `os.replace`. Verify on resume by trimming a copy in-place before launching the 122-batch.
+
+### Pod state at end of session (stopped)
+
+```
+data/forecasts/
+  aifs_20250712T0300_nsteps16.nc          6.8 GB  (original, kept for in-place trim test)
+  aifs_20250712T0300_nsteps16.trimmed.nc   36 MB  (side-file trim, validated)
+```
+
+## Resume checklist (paused 2026-05-25 PM, pod stopped)
+
+### Next session — order of operations
+
+1. **Migrate pod to GPU** via RunPod's "Automatically migrate" option (gets a new H100 with same data volume).
+2. **Verify in-place trim** on the existing 6.8 GB cached forecast:
    ```bash
-   ssh ... "cd /workspace/proto-1 && uv run python -c '
-   import xarray as xr
-   ds = xr.open_dataset(\"data/forecasts/aifs_20250712T0300_nsteps16.nc\")
-   print(dict(ds.dims)); print(list(ds.coords))
-   for c in ds.coords: print(c, ds[c].shape, ds[c].values[:5] if ds[c].size <= 20 else ds[c].values[:3])
-   print(ds.tp06.dims, ds.tp06.shape)'"
+   cd /workspace/proto-1
+   uv run python -c "
+   from pathlib import Path
+   from monsoon_bias.forecast.trim import trim_aifs_forecast
+   p = Path('data/forecasts/aifs_20250712T0300_nsteps16.nc')
+   trim_aifs_forecast(p, out_path=p)
+   print(p.stat().st_size / 1e6, 'MB')
+   "
    ```
-3. **Update `accumulate_aifs_to_imd_day`** to use whatever coord Earth2Studio actually emits (likely `lead_time` + `init_time`, with valid-time computed as their sum). Should be ~10 LoC change.
-4. **Re-run B2** — no GPU work, just imports + accumulator + plot (~3 min). Should produce the 3-panel `outputs/figures/02_one_date_2025-07-15.png` with AIFS + ERA5 + IMERG.
+3. **Re-run B2** post-trim to confirm the cached, trimmed forecast still produces an identical figure (regression check).
+4. **B3: launch script 04** for the full 122-forecast batch.
+   - Wall clock: ~2 min/forecast × 122 ≈ 4 hr on H100 SXM at $2.90/hr ≈ **$12**.
+   - Disk: ~4.5 GB total (trimmed). Comfortably fits.
+5. After B3: implement scripts 05 (`compute_bias`) and 06 (`make_plots`) — currently stubs.
 
-### After B2 passes — open issues for B3 (the 122-forecast batch)
-
-- **Disk:** each forecast NetCDF is ~7.2 GB (AIFS dumps every output variable). 122 forecasts × 7.2 GB = 880 GB; pod disk is 80 GB. Need per-forecast trimming: after each AIFS run, slice out only `tp06`, save ~80 MB, delete the 7.2 GB original.
-- **Per-forecast wall clock:** ~50 s ARCO + ~50 s inference + ~5 s I/O = ~2 min/forecast. 122 × 2 min ≈ 4 hours. ~$12 GPU at $2.90/hr.
-
-### Cost so far: ~$10 of GPU + ~$1 storage. Pod stopped at session end.
+### Cost so far: ~$10 GPU + ~$1 storage from prior sessions; today added pennies (CPU pod).
 
 ## Stack snapshot
 

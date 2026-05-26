@@ -213,26 +213,52 @@ def accumulate_aifs_to_imd_day(
     else:
         raise ValueError(f"AIFS {var} units {units!r}; expected m or mm.")
 
-    time_dim = "time" if "time" in da.dims else (
-        "valid_time" if "valid_time" in da.dims else None)
-    if time_dim is None:
-        raise ValueError(f"AIFS {var} has no time-like dim; dims={da.dims}.")
+    # Earth2Studio 0.14 emits AIFS output with two time-like coords:
+    # ``time`` (size 1, the init time) and ``lead_time`` (timedeltas
+    # from init: 0, 6h, 12h, ..., 96h). The 4 IMD-day windows correspond
+    # to leads 78, 84, 90, 96 h (since init = 03 UTC, lead = 3 days).
+    # Older serializations stored absolute valid-time stamps in a single
+    # ``time`` or ``valid_time`` dim — keep that path for compatibility.
+    if "lead_time" in da.dims:
+        if "time" in da.dims and da.sizes.get("time", 0) == 1:
+            ds_init = pd.Timestamp(da["time"].values.item())
+            if ds_init != init_time:
+                raise ValueError(
+                    f"AIFS dataset init time {ds_init} does not match "
+                    f"argument init_time {init_time}."
+                )
+            da = da.squeeze("time", drop=True)
+        wanted_leads = [pd.Timedelta(hours=h) for h in (78, 84, 90, 96)]
+        present_leads = pd.to_timedelta(da["lead_time"].values)
+        missing = [t for t in wanted_leads if t not in list(present_leads)]
+        if missing:
+            raise ValueError(
+                f"AIFS output missing lead_times {missing} required for IMD day "
+                f"{verifying_date.date()}. Available: {list(present_leads)}"
+            )
+        selected = (da.sel(lead_time=wanted_leads) * scale)
+        time_dim = "lead_time"
+    else:
+        time_dim = "time" if "time" in da.dims else (
+            "valid_time" if "valid_time" in da.dims else None)
+        if time_dim is None:
+            raise ValueError(f"AIFS {var} has no time-like dim; dims={da.dims}.")
 
-    wanted = [
-        verifying_date.normalize() + pd.Timedelta(hours=9),
-        verifying_date.normalize() + pd.Timedelta(hours=15),
-        verifying_date.normalize() + pd.Timedelta(hours=21),
-        verifying_date.normalize() + pd.Timedelta(days=1, hours=3),
-    ]
-    present = pd.to_datetime(da[time_dim].values)
-    missing = [t for t in wanted if t not in present]
-    if missing:
-        raise ValueError(
-            f"AIFS output missing steps {missing} required for IMD day "
-            f"{verifying_date.date()}. Available: {list(present)}"
-        )
+        wanted = [
+            verifying_date.normalize() + pd.Timedelta(hours=9),
+            verifying_date.normalize() + pd.Timedelta(hours=15),
+            verifying_date.normalize() + pd.Timedelta(hours=21),
+            verifying_date.normalize() + pd.Timedelta(days=1, hours=3),
+        ]
+        present = pd.to_datetime(da[time_dim].values)
+        missing = [t for t in wanted if t not in present]
+        if missing:
+            raise ValueError(
+                f"AIFS output missing steps {missing} required for IMD day "
+                f"{verifying_date.date()}. Available: {list(present)}"
+            )
 
-    selected = (da.sel({time_dim: wanted}) * scale)
+        selected = (da.sel({time_dim: wanted}) * scale)
     # Clip negatives; warn if many — that indicates AIFS 1.0.0 (pre-fix).
     n_neg = int((selected < 0).sum())
     n_total = int(selected.size)

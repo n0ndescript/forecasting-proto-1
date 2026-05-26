@@ -27,7 +27,7 @@ _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE.parent / "src"))
 
 from monsoon_bias import config  # noqa: E402
-from monsoon_bias.forecast import run_aifs  # noqa: E402
+from monsoon_bias.forecast import run_aifs, trim as trim_mod  # noqa: E402
 
 
 def main() -> int:
@@ -71,8 +71,22 @@ def main() -> int:
         t0 = time.time()
         try:
             path = run_aifs.run_aifs_forecast(v)
-            dt = time.time() - t0
-            print(f"[{i:3d}/{total}]  verifying {v.date()}  ({dt:5.1f}s)  OK  {path.name}")
+            dt_run = time.time() - t0
+            # Trim from ~7.2 GB → ~40 MB in-place. Failure does NOT abort
+            # the batch — original file is left in place and surfaced as a
+            # warning so a later sweep can re-trim.
+            try:
+                t_trim = time.time()
+                trim_mod.trim_aifs_forecast(path, out_path=path)
+                dt_trim = time.time() - t_trim
+                size_mb = path.stat().st_size / 1e6
+                print(f"[{i:3d}/{total}]  verifying {v.date()}  "
+                      f"run {dt_run:5.1f}s  trim {dt_trim:4.1f}s ({size_mb:5.1f} MB)  "
+                      f"OK  {path.name}")
+            except Exception as trim_exc:  # noqa: BLE001
+                print(f"[{i:3d}/{total}]  verifying {v.date()}  run {dt_run:5.1f}s  "
+                      f"TRIM-FAIL ({type(trim_exc).__name__}: {trim_exc})  "
+                      f"OK (untrimmed) {path.name}")
         except Exception as exc:  # noqa: BLE001 — keep loop alive on per-day failure
             dt = time.time() - t0
             print(f"[{i:3d}/{total}]  verifying {v.date()}  ({dt:5.1f}s)  FAIL  {type(exc).__name__}: {exc}")
