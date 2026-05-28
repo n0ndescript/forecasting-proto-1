@@ -17,6 +17,7 @@ Run:
 
 from __future__ import annotations
 
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -31,9 +32,19 @@ from monsoon_bias.forecast import run_aifs, trim as trim_mod  # noqa: E402
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Run AIFS forecasts for the season.")
+    parser.add_argument(
+        "--limit", type=int, default=None,
+        help="Run at most N forecasts from the head of the todo list. "
+             "Default: no limit (full season). Useful for time-boxed GPU sessions.",
+    )
+    args = parser.parse_args()
+
     print("=" * 78)
     print(f"AIFS batch forecasts | {config.SEASON_START.date()} → {config.SEASON_END.date()}")
     print(f"Project root: {config.PROJECT_ROOT}")
+    if args.limit is not None:
+        print(f"Limit: {args.limit} forecasts this run")
     print("=" * 78)
 
     # Pre-flight: must be on a GPU.
@@ -57,11 +68,18 @@ def main() -> int:
         if not path.exists():
             todo.append(v)
 
+    pending = len(todo)
+    if args.limit is not None:
+        todo = todo[: args.limit]
     total = len(todo)
     if total == 0:
         print("[main] All forecasts already exist on disk. Nothing to do.")
         return 0
-    print(f"[main] {total}/{len(dates)} forecasts to run. Starting...")
+    if args.limit is not None and args.limit < pending:
+        print(f"[main] {total}/{pending} pending forecasts this run "
+              f"(of {len(dates)} season total). Starting...")
+    else:
+        print(f"[main] {total}/{len(dates)} forecasts to run. Starting...")
     print()
 
     failures: list[tuple[pd.Timestamp, str]] = []

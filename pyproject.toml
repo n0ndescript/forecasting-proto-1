@@ -38,6 +38,7 @@ dependencies = [
 gpu = [
     "torch>=2.7,<2.9",                # match prebuilt flash_attn wheels
     "earth2studio[aifs]>=0.14.0",     # 0.14 has lexicons + AIFS-native tp06
+    "anemoi-inference>=0.11",         # not pulled by earth2studio[aifs] in 0.14
 ]
 dev = [
     "jupyter",
