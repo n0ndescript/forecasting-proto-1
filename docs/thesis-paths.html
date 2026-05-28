@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four thesis paths out of Proto 1 — long-form</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #595959;
+    --accent: #b0341e;
+    --bg: #fafaf7;
+    --rule: #d8d6cf;
+    --soft: #f3f1ea;
+    --soft2: #eeece5;
+  }
+  html { font-size: 17px; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Iowan Old Style", "Charter", "Georgia", serif;
+    line-height: 1.65;
+  }
+  .wrap {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 7rem;
+  }
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  h1 {
+    font-size: 1.85rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-style: italic;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin: 3rem 0 0.7rem;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1.3;
+  }
+  h2::before {
+    content: "§";
+    color: var(--rule);
+    margin-right: 0.5em;
+    font-weight: 400;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 2rem 0 0.5rem;
+    font-weight: 600;
+  }
+  h4 {
+    font-size: 0.98rem;
+    margin: 1.4rem 0 0.4rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  p { margin: 0 0 1rem; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin-bottom: 0.4rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.85em;
+    background: var(--soft2);
+    padding: 0 0.25em;
+    border-radius: 3px;
+  }
+  .lede {
+    font-size: 1.12rem;
+    line-height: 1.6;
+    color: var(--fg);
+    margin-bottom: 1.4rem;
+  }
+  blockquote {
+    margin: 1.4rem 0;
+    padding: 0.5rem 1.1rem;
+    border-left: 3px solid var(--accent);
+    background: #f8f3ed;
+    color: var(--fg);
+    font-style: italic;
+  }
+  .pull {
+    border-left: 3px solid var(--rule);
+    padding: 0.6rem 1.1rem;
+    margin: 1.2rem 0;
+    background: var(--soft);
+    font-size: 0.97rem;
+  }
+  .pull-label {
+    display: inline-block;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  nav.toc {
+    background: var(--soft);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.6rem 0 2.5rem;
+    font-size: 0.95rem;
+  }
+  nav.toc h4 {
+    margin: 0 0 0.6rem;
+    color: var(--fg);
+    text-transform: none;
+    font-size: 0.95rem;
+    letter-spacing: 0;
+  }
+  nav.toc ol { margin: 0; padding-left: 1.3rem; }
+  nav.toc li { margin-bottom: 0.3rem; }
+  nav.toc a { color: var(--fg); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  nav.toc a:hover { color: var(--accent); border-bottom-style: solid; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.4rem 0;
+    font-size: 0.93rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.55rem 0.7rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  th {
+    background: var(--soft);
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .small { font-size: 0.9rem; color: var(--muted); }
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: underline;
+  }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+  .caveat {
+    background: #fff8e1;
+    border: 1px solid #f0d995;
+    padding: 0.8rem 1.1rem;
+    margin: 1.4rem 0;
+    font-size: 0.95rem;
+    border-radius: 4px;
+  }
+  .caveat strong { color: #6d4f10; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Four thesis paths out of Proto 1 — long-form</h1>
+  <div class="meta">
+    Follow-on to <a href="phd-trajectory.html">phd-trajectory.html</a>, written for a long-haul flight ·
+    2026-05-28
+  </div>
+</header>
+
+<p class="lede">
+This document expands on the four candidate thesis shapes sketched in the
+short note. The goal is for you to walk off the plane with a much clearer
+sense of which of these (or which hybrid) actually fits your taste, your
+risk tolerance, your advisor's expertise, and the kind of researcher you
+want to be in five years.
+</p>
+
+<p>
+Read it linearly or jump around — each section is self-contained. The
+table of contents below mirrors the structure. If you want only the
+decision-framework parts, skip to §2 and then §8 onward.
+</p>
+
+<nav class="toc">
+  <h4>Contents</h4>
+  <ol>
+    <li><a href="#frame">How to read this document</a></li>
+    <li><a href="#dimensions">The five dimensions that should drive the choice</a></li>
+    <li><a href="#optionA">Option A — Evaluation framework for AI weather over tropical convection</a></li>
+    <li><a href="#optionB">Option B — Corrective heads as a methodological contribution</a></li>
+    <li><a href="#optionC">Option C — Diagnostic studies as a decision framework</a></li>
+    <li><a href="#optionD">Option D — A theoretical pivot on why predictive distributions narrow</a></li>
+    <li><a href="#hybrids">Hybrid combinations actually worth considering</a></li>
+    <li><a href="#failure">Failure modes and red flags</a></li>
+    <li><a href="#career">Career implications and post-PhD landing</a></li>
+    <li><a href="#sixmonth">What to do in the next six months regardless</a></li>
+    <li><a href="#close">Closing: how to actually decide</a></li>
+  </ol>
+</nav>
+
+<hr>
+
+<h2 id="frame">1. How to read this document</h2>
+
+<p>
+A few up-front honesties before the substance.
+</p>
+
+<p>
+<strong>I am a language model, not a PhD committee.</strong> I have read a
+lot of ML papers and I know the AI-weather-modeling literature reasonably
+well. I know less about the lived experience of doing a climate-science
+or applied-ML PhD in the US system in 2026, and I know less still about
+the political dynamics of your specific advisor, department, and committee.
+Where I'm guessing on those, I'll say so.
+</p>
+
+<p>
+<strong>I have biases.</strong> I tend to weigh methodological novelty
+higher than evaluation contributions, because that is what the ML
+literature rewards. Atmospheric science weights things differently — long
+empirical evaluation chapters can be the heart of a thesis there in a way
+they wouldn't be in a CS thesis. Calibrate against your advisor's actual
+preferences, not against my biases.
+</p>
+
+<p>
+<strong>None of these four options is wrong.</strong> Each one is a
+defensible thesis. The question isn't which is best in the abstract; the
+question is which fits the kind of researcher you want to become.
+</p>
+
+<p>
+<strong>You don't have to pick now.</strong> The first 6–12 months of a
+PhD are explicitly for figuring out which question grabs you, not for
+locking in a plan. The "what to do in the next six months" section at the
+end is the actually-actionable part. Everything before it is scenario
+planning.
+</p>
+
+<hr>
+
+<h2 id="dimensions">2. The five dimensions that should drive the choice</h2>
+
+<p>
+Before getting into specific options, here are the dimensions along
+which they really differ. If you read this document and the choice still
+feels muddy, the resolution is probably to figure out where you sit on
+each of these five.
+</p>
+
+<h3>2.1 Advisor's expertise</h3>
+
+<p>
+This is the strongest constraint and the one most students underweight.
+Your advisor will sign your thesis, attend your defense, write your
+recommendation letters, and route you to a postdoc or industry job. If
+your thesis sits in a region they are not comfortable with, you get
+worse mentorship, worse letters, and worse positioning.
+</p>
+
+<p>
+Rough mapping:
+</p>
+
+<table>
+  <thead>
+    <tr><th>If your advisor is…</th><th>The natural fits are…</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>A climate scientist who works on monsoons</td><td>Option A or Option C</td></tr>
+    <tr><td>A climate scientist who works on model evaluation more broadly</td><td>Option A, with potential to pivot to D</td></tr>
+    <tr><td>An ML researcher focused on weather/climate as an application</td><td>Option B or D</td></tr>
+    <tr><td>An applied-math / computational scientist</td><td>Option D, possibly B</td></tr>
+    <tr><td>An operationally-minded person (NWP center, climate services)</td><td>Option B, possibly C</td></tr>
+    <tr><td>Cross-listed: ML <em>and</em> climate</td><td>Any; you have the most freedom</td></tr>
+  </tbody>
+</table>
+
+<p>
+If you're already committed to Hunt as advisor, his prior framing matters
+more than this table. Hunt suggested three precondition tests; that's
+implicitly closer to Option A or C in flavor. But he likely doesn't care
+which exact path you end up on as long as the work is good.
+</p>
+
+<h3>2.2 What kind of contribution feels satisfying to you</h3>
+
+<p>
+There are roughly four kinds of contribution a thesis can make. They
+sound similar but the day-to-day work is very different.
+</p>
+
+<ul>
+  <li><strong>Evaluation contribution</strong> — "Here is how a class of
+    methods/models actually behaves on important problems X, Y, Z." Day
+    to day: a lot of running models, a lot of careful comparison, a lot
+    of plot-making. Satisfying if you like getting the empirical answer
+    right.</li>
+  <li><strong>Methodological contribution</strong> — "Here is a new way
+    to do X that has better properties than existing ways." Day to day:
+    architecting and training models, designing experiments to isolate
+    what's working. Satisfying if you like building things that work
+    better.</li>
+  <li><strong>Theoretical contribution</strong> — "Here is why the
+    current way doesn't work, in principle." Day to day: a lot of
+    reading math, a lot of careful arguments, smaller-scale empirical
+    work designed to test specific claims. Satisfying if you like
+    understanding things at a deeper level than "it works."</li>
+  <li><strong>Synthetic / decision-framework contribution</strong> —
+    "Here is how to decide between methods X, Y, Z for purposes A, B,
+    C." Day to day: lots of breadth, comparison, framework-design. Less
+    common in CS / atmospheric science PhDs; more common in policy,
+    operations research, decision sciences.</li>
+</ul>
+
+<p>
+The four options below map roughly:
+</p>
+
+<ul>
+  <li>Option A → evaluation contribution.</li>
+  <li>Option B → methodological contribution.</li>
+  <li>Option C → synthetic / decision-framework contribution.</li>
+  <li>Option D → theoretical contribution (with empirical support).</li>
+</ul>
+
+<p>
+The biggest predictor of whether a PhD goes well is whether the student
+is doing the kind of contribution they personally find satisfying. The
+opposite — a student who wants to build things but is doing an
+evaluation thesis, or who wants to evaluate but is doing theoretical
+work — produces years of grinding misery and often delayed defenses.
+</p>
+
+<h3>2.3 Risk tolerance</h3>
+
+<p>
+Different options have different expected-value vs variance profiles.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Option</th><th>Expected outcome</th><th>Variance</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>A</td><td>Solid evaluation thesis; multiple workshop / journal papers</td><td>Low — you can almost always grind out the evaluation</td></tr>
+    <tr><td>B</td><td>Methodological contribution if Ch 3 hits; competent applied work if not</td><td>Medium — Ch 3 is where the variance lives</td></tr>
+    <tr><td>C</td><td>Synthesis paper plus three prototypes</td><td>Medium — could feel "thin" in a worst case</td></tr>
+    <tr><td>D</td><td>Could be a celebrated theoretical contribution; could be three years of grinding on a question that doesn't yield a clean result</td><td>High</td></tr>
+  </tbody>
+</table>
+
+<p>
+Risk tolerance is partly personal and partly about your safety net.
+First-generation graduate students, students supporting families,
+students on visa timelines that don't tolerate an extra year — these all
+shift you toward lower variance. Students with a clear academic-career
+appetite and patient advisors / families can take more variance because
+the upside on D is potentially higher.
+</p>
+
+<h3>2.4 Time horizon</h3>
+
+<p>
+US-style atmospheric-science PhDs run 4–6 years. ML-focused PhDs run
+4–5 years. Where you can shave time off without losing thesis quality
+varies by option:
+</p>
+
+<ul>
+  <li>Option A is the most clock-predictable. The work scales linearly
+    with effort.</li>
+  <li>Option B's MVP chapters are predictable; the methodologically-novel
+    Ch 3 can take 1–2 years of trying things that don't work before
+    something does.</li>
+  <li>Option C is fast if executed cleanly (~3 years possible) but more
+    typically expands as each prototype reveals follow-up questions.</li>
+  <li>Option D is the least predictable. A theoretical thesis can defend
+    in 4 years or take 7. The variance is in whether the right
+    conceptual breakthrough actually comes.</li>
+</ul>
+
+<h3>2.5 Job market positioning</h3>
+
+<p>
+What you want to do after the PhD shapes which thesis is best to do
+during it. Rough guide for 2026–2030 weather/climate ML landscape:
+</p>
+
+<ul>
+  <li><strong>Industry AI weather/climate (Google, NVIDIA, ECMWF
+    research, Microsoft, climate-tech startups):</strong> Options A and
+    B both work. B is slightly stronger if the methodological
+    contribution is novel; A is stronger if you want to position for
+    evaluation-team roles.</li>
+  <li><strong>Academic faculty in atmospheric science:</strong> Option
+    A is the most traditional. C is harder to place but possible. B
+    and D are excellent if you want a ML-focused
+    department (rarer in atmospheric science but growing).</li>
+  <li><strong>Academic faculty in ML applied to climate:</strong>
+    Options B and D. A pure evaluation thesis is a tougher hire in ML
+    departments, even ones friendly to applications.</li>
+  <li><strong>National lab or NWP center (NCAR, NOAA, ECMWF, JMA, IMD,
+    UK Met Office):</strong> Any option, but A and C resonate
+    particularly well because evaluation and decision-support work is
+    central to those organizations' missions.</li>
+  <li><strong>Climate-policy or climate-services adjacent careers:</strong>
+    Option C is the most directly relevant; A as a secondary fit.</li>
+  <li><strong>Quant / finance / ML-adjacent industry not specifically
+    in weather/climate:</strong> Honestly, any option works because
+    they care about whether you can think rigorously, not the topic.
+    B and D positioning best for these because they signal
+    methodological/theoretical depth.</li>
+</ul>
+
+<hr>
+
+<h2 id="optionA">3. Option A — Evaluation framework for AI weather over tropical convection</h2>
+
+<p class="lede">
+The most direct extension of Proto 1. The thesis question reframes
+"does AIFS bias have learnable structure" into "across the class of
+AI weather models, what is the bias structure over the world's
+tropical convective regions, and what does it imply for operational
+use?"
+</p>
+
+<h3>3.1 The thesis question, sharpened</h3>
+
+<p>
+"Global AI weather models systematically misrepresent convective
+precipitation in the tropics, with structured biases that vary by
+region and by storm regime, and these biases meaningfully limit
+operational use unless explicitly corrected."
+</p>
+
+<p>
+This is a thesis-shaped claim. It is specific enough to be falsifiable
+("structured biases that vary by region" — show or fail to show that),
+ambitious enough to matter (tropical convection is where global models
+struggle most, and the operational stakes — agriculture, water, disaster
+preparedness — are highest), and bounded enough to be doable in 3–4
+years.
+</p>
+
+<h3>3.2 Chapter-by-chapter breakdown</h3>
+
+<h4>Chapter 1 — A reusable bias evaluation framework</h4>
+
+<p>
+Build the infrastructure (much of which already exists from Proto 1)
+for a uniform comparison of multiple AI weather models across multiple
+years and multiple regions. Concretely:
+</p>
+
+<ul>
+  <li><strong>Models:</strong> AIFS, AIFS-ENS, GraphCast, Pangu,
+    FourCastNet-Spherical, and at least one operational baseline
+    (ECMWF HRES). Five to six models in total.</li>
+  <li><strong>Regions:</strong> Three or four tropical regions with
+    distinct convective regimes —
+    Indian monsoon (Proto 1 region; you already have the pipeline),
+    West African monsoon (different orographic geometry, different
+    moisture source, different aerosol environment),
+    Maritime Continent / Indonesia (the hardest case for any model —
+    small islands, complex orography, diurnal cycle driven),
+    and optionally Amazon basin (different from monsoonal but
+    representative of tropical convection more broadly).</li>
+  <li><strong>Years:</strong> 5–10 years for each region, depending on
+    data availability. IMERG goes back to 2000; ERA5 to 1940; high-
+    quality gauge networks vary.</li>
+  <li><strong>Diagnostics:</strong> Generalized from Proto 1 — mean bias
+    maps, RMSE maps, regional stratifications, regime stratifications
+    (BSISO for the Indian monsoon, West African Monsoon Index for West
+    Africa, MJO RMM as a regime variable that crosses regions),
+    elevation-stratified bias, rainfall-magnitude stratified bias.</li>
+</ul>
+
+<p>
+This chapter is mostly engineering effort on top of Proto 1.
+Contribution: a community-usable evaluation framework, plus the
+first published cross-model cross-region tropical convection
+evaluation at this scale.
+</p>
+
+<h4>Chapter 2 — What drives the bias structure</h4>
+
+<p>
+This is the hard chapter and the one that elevates the thesis from
+"evaluation" to "evaluation with insight." You cannot retrain the
+big models (you don't have their training infrastructure or budget),
+so "ablation" here means analytical decomposition rather than direct
+ablation:
+</p>
+
+<ul>
+  <li><strong>Loss function decomposition.</strong> AIFS, GraphCast,
+    etc. train predominantly with MSE-like losses on autoregressive
+    rollouts. There is good theoretical reason to expect this to drive
+    conditional-mean prediction (i.e., narrow distributions). You can
+    demonstrate this empirically by training a smaller controlled
+    model (e.g., StormCast at regional scale, or a custom small UNet)
+    with MSE vs quantile vs CRPS losses on the same data and showing
+    distribution-shape changes.</li>
+  <li><strong>Training-data smoothing decomposition.</strong> ERA5 is
+    itself biased over India and the tropics (Proto 1 demonstrated
+    this). To what extent are AIFS's biases inherited from ERA5 versus
+    introduced by the model? Compute the AIFS−ERA5 residual across
+    your full evaluation set and characterize its structure.</li>
+  <li><strong>Architectural comparison.</strong> AIFS uses a graph
+    architecture, GraphCast a different graph architecture, Pangu
+    transformers, FourCastNet-Spherical Fourier neural operators.
+    Where their biases agree, blame is on training data or training
+    objective. Where they diverge, architecture matters. The pattern of
+    agreement is itself the result of this chapter.</li>
+  <li><strong>Resolution decomposition.</strong> Compare against a high-
+    resolution downscaled or convection-permitting model (e.g.,
+    GraphCast-Operational at 0.25° vs higher-resolution regional models
+    where available). Bias structure that disappears with resolution
+    you attribute to coarse-grid orography smoothing; bias structure
+    that persists you attribute to deeper model issues.</li>
+</ul>
+
+<p>
+The honest difficulty here is that none of these decompositions is
+clean. You will get correlational evidence, not causal evidence. That's
+okay — make the limits of the claims explicit, and design the
+analysis to give the most informative correlational evidence possible.
+The contribution is the first systematic attempt at this kind of
+decomposition.
+</p>
+
+<h4>Chapter 3 — Corrective head as a downstream remedy</h4>
+
+<p>
+Essentially the corrective head MVP from the immediate follow-on,
+expanded to multiple models and multiple regions. Concretely:
+</p>
+
+<ul>
+  <li>Tabular MVP (gradient-boosted trees, LightGBM with quantile loss
+    at first; then a small CNN with spatial context once the MVP is
+    settled).</li>
+  <li>Trained on India 2025 → tested on India 2024 (year transfer).</li>
+  <li>Trained on India → tested on West Africa (region transfer).</li>
+  <li>Trained on AIFS → applied to GraphCast (model transfer; tests
+    whether the correction captures something AIFS-specific or
+    weather-model-class-general).</li>
+</ul>
+
+<p>
+Comparison: corrected forecast vs raw AIFS on the same diagnostics
+from Chapter 1. Headline metric: heavy-rain detection rate (already
+discussed), plus CRPS improvement and calibration of the corrected
+probabilistic output.
+</p>
+
+<h4>Chapter 4 — Operational implications and a deployable artifact</h4>
+
+<p>
+The final chapter takes the corrected forecasts and asks the real
+question: do they improve any downstream user's decision? Concrete
+candidates:
+</p>
+
+<ul>
+  <li><strong>Reservoir management:</strong> Take the corrected
+    forecasts, feed them into a simplified reservoir-operations model,
+    show that decisions based on the corrected forecast lead to better
+    outcomes (less spillage, fewer outage events) than decisions based
+    on the raw forecast.</li>
+  <li><strong>Agricultural decisions:</strong> Same idea, simpler
+    user model — would a farmer who plants vs delays based on the
+    forecast end up better off?</li>
+  <li><strong>Flood warning:</strong> Skill in the heavy-rain
+    detection metric translates into hit rate and false-alarm rate for
+    flood warnings.</li>
+</ul>
+
+<p>
+A small amount of decision-relevant analysis here goes a long way,
+because it gives the thesis a clear operational anchor. This is the
+chapter that distinguishes "publishable evaluation" from "evaluation
+the community actually cares about."
+</p>
+
+<h3>3.3 Where the contributions live</h3>
+
+<ul>
+  <li><strong>Chapter 1:</strong> Empirical contribution — the bias
+    characterization itself plus a reusable framework.</li>
+  <li><strong>Chapter 2:</strong> Analytical contribution — the
+    decomposition methodology.</li>
+  <li><strong>Chapter 3:</strong> Methodological contribution — the
+    corrective head and its transfer properties.</li>
+  <li><strong>Chapter 4:</strong> Applied contribution — the
+    downstream-decision evaluation.</li>
+</ul>
+
+<p>
+Four chapters, four kinds of contribution. This is what makes it
+robust as a thesis — even if one chapter is weaker, the other three
+carry the work.
+</p>
+
+<h3>3.4 Realistic compute and time costs</h3>
+
+<table>
+  <thead>
+    <tr><th>Component</th><th>Compute</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Ch 1: 6 models × 4 regions × 10 years × 365 days</td><td>~5,000–10,000 hours of H100, depending on model</td><td>9–12 months</td></tr>
+    <tr><td>Ch 2: small controlled model training + analysis</td><td>~1,000 hours of H100 for the controlled ablations</td><td>6–9 months</td></tr>
+    <tr><td>Ch 3: corrective head training + transfer experiments</td><td>~CPU + occasional GPU</td><td>6 months</td></tr>
+    <tr><td>Ch 4: decision-relevant analysis</td><td>CPU only</td><td>3–6 months</td></tr>
+    <tr><td>Writing / committee process</td><td>—</td><td>6 months</td></tr>
+  </tbody>
+</table>
+
+<p>
+Total realistic time: 3.5 years if things go well, 4.5 if not.
+Total compute: 10,000–15,000 H100-hours, which at on-demand cloud
+prices is $30–50k but typically delivered via NCAR / NSF allocation
+or your advisor's institutional compute — probably free at the
+margin.
+</p>
+
+<h3>3.5 Where this competes with existing work</h3>
+
+<p>
+The risk for Option A is that "AI weather model evaluation" is a
+crowded space in 2026. ECMWF, NVIDIA, Microsoft, NCAR, and individual
+academic groups all publish evaluation papers regularly. To not get
+scooped, you need a defensible angle. The angles I'd consider:
+</p>
+
+<ul>
+  <li><strong>Tropical convection specifically.</strong> The published
+    evaluation literature is overwhelmingly Northern Hemisphere
+    extratropical. A thesis-scale effort focused on tropical
+    convection fills a real gap.</li>
+  <li><strong>Cross-region comparison.</strong> Most published work is
+    single-region. A four-region cross-comparison is novel.</li>
+  <li><strong>The decomposition methodology in Chapter 2.</strong> If
+    you can pull off a clean analytical decomposition of bias drivers,
+    that's a methodological contribution worth a strong paper.</li>
+  <li><strong>The decision-relevant evaluation in Chapter 4.</strong>
+    Almost nobody in ML weather modeling does this. It's a sharp
+    differentiator.</li>
+</ul>
+
+<h3>3.6 Failure modes</h3>
+
+<ul>
+  <li>You spend years generating careful evaluations that are then
+    obviated by a new model release. Mitigation: design Chapter 1's
+    framework so adding a new model is a few days, not months. Adding
+    a new model release should be a robustness check, not a setback.</li>
+  <li>Chapter 2's decomposition turns out to be too noisy to support
+    clean conclusions. Mitigation: scope Chapter 2 narrower if needed
+    (focus on loss function decomposition only, with the small-model
+    ablation being the main evidence). The thesis still works without
+    a tight Chapter 2.</li>
+  <li>Chapter 4 ends up being a small pilot rather than a substantive
+    analysis. Mitigation: pick one of the three application candidates
+    upfront and partner with someone in that domain. A single deep
+    application is better than three shallow ones.</li>
+  <li>The thesis reads as four loosely connected papers rather than a
+    coherent program. Mitigation: write Chapter 1's framework
+    explicitly so that Chapters 2–4 build on it. The framework is
+    the spine.</li>
+</ul>
+
+<h3>3.7 Who this fits</h3>
+
+<p>
+The student who would thrive in Option A:
+</p>
+
+<ul>
+  <li>Likes systems work and infrastructure, doesn't mind grinding
+    through evaluation runs.</li>
+  <li>Has a meteorology or climate science background (or the
+    motivation to acquire one).</li>
+  <li>Wants a strong applied or national-lab career, or a faculty
+    job in an atmospheric-science department.</li>
+  <li>Is risk-averse and wants high confidence of finishing in 4 years.</li>
+  <li>Has an advisor who is themselves an evaluation-oriented climate
+    scientist.</li>
+</ul>
+
+<hr>
+
+<h2 id="optionB">4. Option B — Corrective heads as a methodological contribution</h2>
+
+<p class="lede">
+The product-shaped path. The thesis reframes as "global AI weather
+models produce useful but biased forecasts; a class of small downstream
+models can correct the biases in principled ways, with theory and
+practice that generalize across models and regions."
+</p>
+
+<h3>4.1 The thesis question, sharpened</h3>
+
+<p>
+"Corrective models trained on global-AI-weather-model output produce
+substantial skill gains over the raw forecasts, with architectural and
+training-objective choices that generalize beyond a single region and a
+single source model."
+</p>
+
+<p>
+The implicit ambition of this thesis is methodological — by the end of
+it, the field should have a better understanding of how to do downstream
+correction of AI weather model output. Not just "we corrected one model
+in one place" but "here are the principles."
+</p>
+
+<h3>4.2 Chapter-by-chapter breakdown</h3>
+
+<h4>Chapter 1 — Motivation and baseline characterization</h4>
+
+<p>
+Proto 1 condensed, plus extension to one or two additional models
+(GraphCast minimum) to motivate that the bias pattern generalizes. This
+is the "the problem exists and is worth fixing" chapter.
+</p>
+
+<h4>Chapter 2 — A principled MVP corrective head</h4>
+
+<p>
+The careful baseline. Tabular gradient-boosted regression with the
+features and quantile loss discussed earlier. The careful part is in
+the experiments:
+</p>
+
+<ul>
+  <li><strong>Feature ablations.</strong> Which features actually
+    contribute, in what proportion? Validation that the model is
+    exploiting the structural patterns from Chapter 1.</li>
+  <li><strong>Loss function ablations.</strong> MSE vs Huber vs
+    quantile vs weighted vs CRPS. The differences matter most in the
+    tail bins.</li>
+  <li><strong>Spatial holdout vs random holdout vs temporal holdout.</strong>
+    Different holdouts answer different questions about generalization.
+    Doing all three gives a much richer picture of where the model
+    transfers and where it doesn't.</li>
+  <li><strong>Comparison to traditional MOS (Model Output Statistics).</strong>
+    Traditional NWP post-processing has decades of methodology;
+    cite it, compare against it, position your corrective head
+    as the AI-era successor.</li>
+</ul>
+
+<p>
+This chapter alone is a strong workshop or methods-track paper. The
+thesis-shaped version is to make it the careful baseline for everything
+that follows.
+</p>
+
+<h4>Chapter 3 — A genuinely novel architecture</h4>
+
+<p>
+This is the high-variance chapter and the one that determines whether
+the thesis has a real methodological contribution or is "applied
+LightGBM." Candidates I'd consider, ordered by ambition:
+</p>
+
+<p>
+<strong>3.a Spatial-context UNet with quantile head.</strong> Takes a
+window of the AIFS field plus static features, outputs a corrected
+field with calibrated quantiles. This is the obvious next step beyond
+the MVP. The contribution is in making it work for tropical convective
+extremes, which standard UNet training does not naturally do.
+</p>
+
+<p>
+<strong>3.b Conditional score-based / diffusion correction.</strong>
+Train a diffusion model conditional on AIFS output and static features
+to sample from the conditional distribution of true rainfall. This is
+the strongest match to the "narrow predictive distribution" problem
+Proto 1 surfaced — diffusion models can produce calibrated extreme
+draws. The contribution is genuine novelty: nobody has shipped a
+diffusion-based correction model for AI weather output (as of my
+knowledge). It's also the most likely to fail.
+</p>
+
+<p>
+<strong>3.c Equivariant or physics-informed architecture.</strong>
+Build in inductive biases — rotational equivariance to make corrections
+consistent under coordinate changes, or physics constraints (mass
+conservation, positive precipitation, spatial smoothness penalties).
+Contribution: showing that domain-specific inductive bias improves
+generalization to new regions.
+</p>
+
+<p>
+<strong>3.d Multi-task probabilistic correction.</strong> Train a
+correction model that outputs not just point predictions but
+parameters of a distribution (or a quantile fan). Contribution:
+the calibration analysis matters, the distributional skill matters,
+the connection to operational probabilistic forecasting is direct.
+</p>
+
+<p>
+The smart move is to pick one of these (probably 3.b — diffusion — if
+you have the appetite, or 3.d if you want lower risk) and execute it
+deeply. Trying to ship all four is a sub-thesis-per-chapter trap.
+</p>
+
+<h4>Chapter 4 — Cross-model, cross-region transfer</h4>
+
+<p>
+Apply the architecture from Chapter 3 across (model, region) pairs:
+</p>
+
+<ul>
+  <li>Train on AIFS-India, evaluate on AIFS-West-Africa (region
+    transfer).</li>
+  <li>Train on AIFS-India, evaluate on GraphCast-India (model
+    transfer).</li>
+  <li>Train on AIFS-India, evaluate on GraphCast-West-Africa (both).</li>
+  <li>Train jointly on multiple (model, region) pairs, evaluate on a
+    held-out pair (multi-task transfer).</li>
+</ul>
+
+<p>
+The contribution is characterizing how well corrections transfer
+across these dimensions. The published transfer-learning literature
+for weather model correction is sparse; clean results here are highly
+citable.
+</p>
+
+<h4>Chapter 5 — Operational deployment and what it costs</h4>
+
+<p>
+The deployment chapter. Inference cost (how fast does correction run
+on top of AIFS), latency, integration with operational pipelines.
+Real or simulated operational deployment with a partner organization
+if possible (NCAR, ECMWF, IMD, or a startup like Atmo or
+Tomorrow.io).
+</p>
+
+<p>
+This chapter is what gets you noticed by the operational community.
+A thesis without it is "interesting research"; with it, it's
+"someone who could ship this in production."
+</p>
+
+<h3>4.3 Where the contributions live</h3>
+
+<ul>
+  <li><strong>Chapter 1:</strong> Empirical contribution — the
+    motivation and bias characterization.</li>
+  <li><strong>Chapter 2:</strong> Methodological contribution — the
+    careful MVP and ablations.</li>
+  <li><strong>Chapter 3:</strong> Methodological contribution
+    (the novel architecture). This is the one that determines the
+    thesis's lasting impact.</li>
+  <li><strong>Chapter 4:</strong> Empirical contribution — the
+    transfer characterization.</li>
+  <li><strong>Chapter 5:</strong> Applied / engineering contribution.</li>
+</ul>
+
+<h3>4.4 Realistic compute and time costs</h3>
+
+<table>
+  <thead>
+    <tr><th>Component</th><th>Compute</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Ch 1: Proto 1 + GraphCast extension</td><td>~$50–100 GPU</td><td>3 months</td></tr>
+    <tr><td>Ch 2: MVP + ablations</td><td>CPU + occasional GPU</td><td>6 months</td></tr>
+    <tr><td>Ch 3: novel architecture</td><td>~2,000–5,000 H100-hours if diffusion; ~500 if UNet</td><td>12–18 months (lots of failed attempts before something works)</td></tr>
+    <tr><td>Ch 4: transfer experiments</td><td>~CPU + occasional GPU</td><td>6 months</td></tr>
+    <tr><td>Ch 5: deployment</td><td>variable</td><td>3–6 months</td></tr>
+    <tr><td>Writing / committee</td><td>—</td><td>6 months</td></tr>
+  </tbody>
+</table>
+
+<p>
+Total realistic time: 4 years if Chapter 3 yields cleanly,
+5+ years if not. Compute is moderate compared to Option A.
+</p>
+
+<h3>4.5 Where this competes with existing work</h3>
+
+<p>
+Option B competes with:
+</p>
+
+<ul>
+  <li><strong>Industry post-processing teams.</strong> Google, NVIDIA,
+    ECMWF, and several startups are working on similar corrections.
+    They have more compute and more engineering resources than you.
+    What you have that they don't: time to do something carefully,
+    freedom to publish, and the ability to focus on the
+    methodologically interesting parts rather than the
+    operational/commercial parts.</li>
+  <li><strong>Academic post-processing groups in NWP.</strong> Long
+    tradition; Stephane Vannitsem, Sebastian Lerch, others. They
+    typically work on statistical post-processing of physics-based
+    models. Your angle is post-processing of AI weather models, which
+    is a fresh subfield. Most of their methods are likely
+    transferable.</li>
+  <li><strong>Traditional downscaling / bias correction in climate
+    science.</strong> Decades of work. Most of it is regression-based
+    and operates on monthly/seasonal scales rather than the per-day,
+    per-cell granularity you'd be working at. Some overlap; should be
+    cited; not directly competitive.</li>
+</ul>
+
+<p>
+The defensible angle is the combination of (a) AI weather model
+output as the target of correction, (b) the architectural novelty in
+Chapter 3, and (c) the transfer characterization in Chapter 4. Without
+those, you risk being seen as "doing post-processing in 2026."
+</p>
+
+<h3>4.6 Failure modes</h3>
+
+<ul>
+  <li>Chapter 3's novel architecture doesn't beat the MVP from Chapter
+    2. This is the dominant risk. Mitigation: structure Chapter 3 so
+    that even if the headline architecture doesn't win, you still
+    have a clean methodological contribution about when it does and
+    doesn't work, and what that implies for downstream model design.
+    "We tried this and here is why it didn't work" is a thesis-worthy
+    result if the analysis of why is rigorous.</li>
+  <li>Industry ships a better corrective system before you can publish.
+    Mitigation: focus on aspects that industry typically doesn't
+    publish — careful ablations, transfer characterization, theory.
+    Your contribution is the systematic understanding, not the
+    deployed product.</li>
+  <li>Cross-region transfer doesn't work. This is actually a positive
+    result if you frame it right ("here is why region-specific
+    correction is necessary, with characterization") but it can feel
+    like a failure if you went into Chapter 4 expecting positive
+    transfer.</li>
+  <li>Chapter 5 partnerships don't materialize. National lab or
+    industry partnerships take 6–12 months of negotiation. Start
+    cultivating them in Year 2.</li>
+</ul>
+
+<h3>4.7 Who this fits</h3>
+
+<ul>
+  <li>The student who likes building things that work better.</li>
+  <li>Comfortable with ML systems work and not afraid of training
+    new models from scratch.</li>
+  <li>Wants industry post-PhD with maybe a faculty fallback, or
+    faculty in an ML/CS department with a climate focus.</li>
+  <li>Medium-to-high risk tolerance (Chapter 3 is the variance
+    chapter).</li>
+  <li>Has an advisor who supports ambitious methodological work and
+    has at least passing familiarity with diffusion or generative
+    methods (or is comfortable letting you collaborate with someone
+    who does).</li>
+</ul>
+
+<hr>
+
+<h2 id="optionC">5. Option C — Diagnostic studies as a decision framework</h2>
+
+<p class="lede">
+The Hunt-shaped thesis. The thesis question is meta: "given that there
+are multiple defensible operational research directions for applying AI
+to monsoon forecasting (corrective heads, regime-conditioned ensembles,
+climate emulator climatology), which should the community invest in,
+and what does the diagnostic evidence say?"
+</p>
+
+<h3>5.1 The thesis question, sharpened</h3>
+
+<p>
+"The choice between three plausible operational futures for AI weather
+modeling in the Indian monsoon (corrective post-processing of
+deterministic forecasts; regime-conditioned ensemble weighting; AI
+climate emulator climatology) is best made empirically on the basis
+of three independent precondition tests, which this thesis conducts
+and synthesizes."
+</p>
+
+<p>
+This is unusual as a thesis question. Most theses make a single
+substantive claim; this one makes a framework claim. The risk is that
+a committee responds <em>"this is a survey, not original research."</em>
+The defense against that risk is the rigor of the three precondition
+tests and the sharpness of the synthesis.
+</p>
+
+<h3>5.2 Chapter-by-chapter breakdown</h3>
+
+<h4>Chapter 1 — Framing and the three operational futures</h4>
+
+<p>
+The literature review and framing chapter. Why these three futures
+and not others. What's at stake operationally. What a precondition
+test means and why each operational future has one. This is the
+chapter that has to convince a committee that the rest of the thesis
+isn't just three loosely connected projects.
+</p>
+
+<h4>Chapter 2 — Proto 1 expanded (corrective head precondition)</h4>
+
+<p>
+The Proto 1 work, finished and expanded. Three findings, characterized
+across two years (2024 and 2025) and at least two models (AIFS and
+either GraphCast or AIFS-ENS). The precondition test: does the bias
+have learnable structure?
+</p>
+
+<p>
+Result framing: yes / no / partial, with quantification. If yes,
+corrective post-processing is justified.
+</p>
+
+<h4>Chapter 3 — Proto 2 (regime-conditioned ensemble precondition)</h4>
+
+<p>
+Run two probabilistic models (AIFSENS and either GenCast or a
+constructed ensemble of perturbed deterministic AIFS runs). Compute
+CRPS at each lead. Stratify by atmospheric regime — start with MJO RMM
+since BSISO is blocked; add self-computed BSISO if it cleanly works.
+Compare model ranking across regimes.
+</p>
+
+<p>
+Result framing: do the model rankings change with regime? If yes,
+regime-conditioned ensemble weighting is justified.
+</p>
+
+<h4>Chapter 4 — Proto 3 (climate emulator climatology precondition)</h4>
+
+<p>
+Run ACE2 (or DLESyM) for 10 years, ideally with 3–5 seeds. Compare
+monsoon climatology (mean rainfall, seasonal cycle, onset date,
+trough position) against GPCC and ERA5. The precondition test: does
+the emulator reproduce monsoon climatology approximately?
+</p>
+
+<p>
+Result framing: yes / no / interesting failure. Any of the three is a
+useful finding.
+</p>
+
+<h4>Chapter 5 — Synthesis and decision framework</h4>
+
+<p>
+The integrative chapter. Take the three precondition results and
+construct a decision framework: under what circumstances should the
+community invest in each operational future. This is the chapter
+that determines whether the thesis adds up to more than its parts.
+</p>
+
+<p>
+Concretely:
+</p>
+
+<ul>
+  <li>Cost-benefit framework: development time, compute requirements,
+    operational integration cost, expected skill improvement.</li>
+  <li>Regime-of-validity for each operational future based on the
+    precondition results.</li>
+  <li>Sensitivity to assumptions: under what conditions would the
+    decision change?</li>
+  <li>Implications for stakeholders: NWP centers, climate services,
+    end users.</li>
+</ul>
+
+<h4>Chapter 6 — A representative downstream demonstration</h4>
+
+<p>
+Optional but valuable. Pick the operational future the decision
+framework most strongly endorses and build a representative version
+of it. This grounds the thesis in tangible artifact-form output.
+</p>
+
+<h3>5.3 Where the contributions live</h3>
+
+<ul>
+  <li><strong>Chapters 2–4:</strong> Empirical contributions — three
+    self-contained precondition results.</li>
+  <li><strong>Chapter 5:</strong> Synthetic contribution — the
+    decision framework.</li>
+  <li><strong>Chapter 6 (if included):</strong> Applied contribution.</li>
+</ul>
+
+<p>
+The synthesis chapter is where the thesis lives or dies. A weak
+synthesis makes the thesis feel like three separate projects in a
+folder. A strong synthesis is genuinely novel — there is no published
+"how to choose between AI operational futures for monsoon forecasting"
+framework.
+</p>
+
+<h3>5.4 Realistic compute and time costs</h3>
+
+<table>
+  <thead>
+    <tr><th>Component</th><th>Compute</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Ch 2: Proto 1 expanded</td><td>~$50–100</td><td>6–9 months</td></tr>
+    <tr><td>Ch 3: Proto 2</td><td>~$150–300</td><td>6–9 months</td></tr>
+    <tr><td>Ch 4: Proto 3</td><td>~$50–150</td><td>6–12 months (depends on ACE2 stability)</td></tr>
+    <tr><td>Ch 5: synthesis</td><td>—</td><td>3–6 months</td></tr>
+    <tr><td>Ch 6: representative implementation</td><td>variable</td><td>6 months if included</td></tr>
+    <tr><td>Writing / committee</td><td>—</td><td>4 months</td></tr>
+  </tbody>
+</table>
+
+<p>
+Total realistic time: 3 years if everything goes smoothly,
+4 years more typically. This is the fastest-to-defense of the four
+options, because each chapter is a self-contained study with bounded
+scope.
+</p>
+
+<h3>5.5 Where this competes with existing work</h3>
+
+<p>
+Lower competition than A or B — nobody is doing exactly this. The
+risk isn't being scooped; the risk is being seen as "not real
+research" by a traditional committee.
+</p>
+
+<p>
+Closest existing work: review articles and perspective pieces in
+journals like <em>Bulletin of the AMS</em>, <em>Reviews of Geophysics</em>,
+<em>Nature Reviews Earth & Environment</em>. Your thesis would be a much
+more rigorous version of that genre — actual experiments rather than
+synthesis of others' results, with a clear decision-framework output.
+</p>
+
+<h3>5.6 Failure modes</h3>
+
+<ul>
+  <li>The synthesis chapter doesn't add up. This is the dominant
+    risk. Mitigation: design the synthesis from the start. Decide in
+    Year 1 what the decision framework will look like at a high level
+    and let that shape how you design each of the three precondition
+    tests.</li>
+  <li>One of the precondition tests yields an ambiguous result.
+    Mitigation: design each precondition test to produce a useful
+    finding regardless of which way it goes (Proto 3's "interesting
+    failure mode" framing is the right instinct).</li>
+  <li>Committee reads it as a survey. Mitigation: lead with the
+    decision framework throughout the writing. The three preconditions
+    are evidence; the framework is the contribution.</li>
+  <li>The community moves on from one of the three preconditions
+    before you finish. Mitigation: pick preconditions for operational
+    futures that the community is genuinely uncertain about, not ones
+    that will be obviously settled by the time you defend.</li>
+</ul>
+
+<h3>5.7 Who this fits</h3>
+
+<ul>
+  <li>Likes breadth more than depth.</li>
+  <li>Wants to defend reasonably quickly and move on.</li>
+  <li>Career goal is operational, policy, climate services, or
+    national lab rather than research faculty.</li>
+  <li>Has an advisor who understands the value of synthesis and is
+    willing to defend the thesis shape to traditional committee
+    members.</li>
+  <li>Low-to-medium risk tolerance.</li>
+</ul>
+
+<hr>
+
+<h2 id="optionD">6. Option D — A theoretical pivot on why predictive distributions narrow</h2>
+
+<p class="lede">
+The most ambitious and the highest-variance option. Reframes Proto 1's
+finding as a question of fundamental ML methodology: why do autoregressive
+deep-learning weather models produce narrow predictive distributions,
+and what can be done about it at the architecture / training / theory
+level?
+</p>
+
+<h3>6.1 The thesis question, sharpened</h3>
+
+<p>
+"Autoregressive deep-learning weather models trained with MSE-class
+losses systematically converge to conditional-mean prediction. This
+distributional collapse has identifiable causes — in the loss function,
+the training data distribution, and the model architecture — and can be
+mitigated through training-objective design, generative modeling, and
+explicit distributional modeling."
+</p>
+
+<p>
+This is the most thesis-shaped of the four options, in the sense that
+it makes a substantive, falsifiable, ML-methodologically interesting
+claim. It is also the most likely to take 6 years and the most likely
+to depend on a single key insight that you may or may not have during
+your PhD.
+</p>
+
+<h3>6.2 Chapter-by-chapter breakdown</h3>
+
+<h4>Chapter 1 — Empirical motivation</h4>
+
+<p>
+Proto 1, extended to other models and to controlled small-scale
+experiments. Demonstrate the narrow-distribution phenomenon
+robustly across architectures and training regimes. The contribution
+is the systematic empirical characterization — showing this isn't
+an AIFS quirk but a class-wide phenomenon.
+</p>
+
+<h4>Chapter 2 — Why this happens, in principle</h4>
+
+<p>
+The theoretical / analytical chapter. Possible directions:
+</p>
+
+<ul>
+  <li><strong>MSE loss drives conditional-mean prediction</strong> — a
+    statement that is true in single-step regression but harder to
+    pin down formally in autoregressive rollout settings. The
+    contribution is making this rigorous: prove or empirically
+    demonstrate that for autoregressive forecasting models, MSE
+    training on rollouts of length N produces strictly narrower
+    distributions than alternative training schemes.</li>
+  <li><strong>Iterative noise amplification under autoregression.</strong>
+    Each step's stochasticity gets averaged out in the conditional mean
+    prediction, so multi-step rollouts produce distributions that are
+    much narrower than warranted by the true stochasticity of the
+    system.</li>
+  <li><strong>Training data smoothing.</strong> ERA5 is an analysis
+    product that already smooths sub-grid stochasticity. Models trained
+    on it inherit the smoothing.</li>
+  <li><strong>Architectural constraints.</strong> Most current AI
+    weather models lack any stochastic latent variables; they are
+    deterministic functions of the input. This constrains the
+    distribution shape to whatever the deterministic function class
+    can produce.</li>
+</ul>
+
+<p>
+The strongest version of this chapter argues for all four causes in
+combination, with empirical or theoretical evidence for each. The
+weakest version picks one and goes deep.
+</p>
+
+<h4>Chapter 3 — Training-objective contributions</h4>
+
+<p>
+Design and validate training objectives that produce calibrated
+distributions. Candidates:
+</p>
+
+<ul>
+  <li><strong>CRPS as the training loss.</strong> CRPS is naturally
+    distributional. Train AI weather models with CRPS instead of MSE
+    and characterize the resulting distribution shapes.</li>
+  <li><strong>Quantile regression.</strong> Output multiple quantiles
+    rather than a single point prediction. Connection to operational
+    probabilistic forecasting is direct.</li>
+  <li><strong>Distributional matching losses.</strong> Train the model
+    so that the distribution of its output matches the distribution
+    of the target, not just point-by-point.</li>
+  <li><strong>Adversarial losses.</strong> A discriminator that
+    distinguishes model output from real observations. Encourages
+    realism in the distributional sense.</li>
+</ul>
+
+<p>
+The contribution is a systematic understanding of which training
+objectives produce which distribution properties, with concrete
+recommendations for the field.
+</p>
+
+<h4>Chapter 4 — Architectural contributions</h4>
+
+<p>
+Design and validate architectures that produce calibrated
+distributions. Candidates:
+</p>
+
+<ul>
+  <li><strong>Conditional score-based / diffusion weather models.</strong>
+    The state-of-the-art generative approach. GenCast is an example
+    that already exists; the contribution would be a deeper
+    architectural / theoretical understanding of why and when it
+    works.</li>
+  <li><strong>VAE-style stochastic weather models.</strong> Latent
+    variable models that explicitly sample stochasticity at each
+    step.</li>
+  <li><strong>Multi-head probabilistic prediction.</strong> The
+    architecture outputs parameters of a distribution at each grid
+    cell at each timestep, learned end-to-end.</li>
+  <li><strong>Stochastic perturbation methods.</strong> Following
+    operational NWP practice (Stochastic Kinetic Energy Backscatter,
+    etc.), introduce stochasticity at each step in a principled way.</li>
+</ul>
+
+<h4>Chapter 5 — Empirical validation on the Indian monsoon</h4>
+
+<p>
+Apply the new training objectives and architectures to Proto 1's
+setup. Show that the calibration problems Proto 1 identified are
+mitigated. This grounds the theoretical work in the original
+empirical motivation.
+</p>
+
+<h4>Chapter 6 — Implications for AI weather modeling more broadly</h4>
+
+<p>
+Synthesis chapter. Position the contributions in the broader landscape
+of AI weather modeling. What is now known, what remains open, what
+recommendations follow for the field.
+</p>
+
+<h3>6.3 Where the contributions live</h3>
+
+<ul>
+  <li><strong>Chapter 1:</strong> Empirical contribution — the
+    phenomenon characterization.</li>
+  <li><strong>Chapter 2:</strong> Theoretical / analytical contribution
+    — the diagnosis.</li>
+  <li><strong>Chapter 3:</strong> Methodological contribution — the
+    training objectives.</li>
+  <li><strong>Chapter 4:</strong> Methodological contribution — the
+    architectures.</li>
+  <li><strong>Chapter 5:</strong> Empirical contribution — the
+    validation.</li>
+  <li><strong>Chapter 6:</strong> Synthesis.</li>
+</ul>
+
+<p>
+This is the most ambitious option in terms of number and type of
+contributions. It is also the most likely to overrun.
+</p>
+
+<h3>6.4 Realistic compute and time costs</h3>
+
+<p>
+The honest answer is that compute and time are highly variable
+for Option D. If Chapter 2 yields a clean theoretical result early,
+the rest is fast. If it doesn't, you could spend years on Chapters
+3 and 4 trying to find a clean methodological contribution.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Component</th><th>Compute</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Ch 1</td><td>~$200</td><td>6 months</td></tr>
+    <tr><td>Ch 2</td><td>variable (small controlled experiments)</td><td>9–18 months</td></tr>
+    <tr><td>Ch 3</td><td>~5,000+ H100-hours for serious training</td><td>12–18 months</td></tr>
+    <tr><td>Ch 4</td><td>~10,000+ H100-hours for diffusion / generative architectures</td><td>18–24 months</td></tr>
+    <tr><td>Ch 5</td><td>~$500</td><td>6 months</td></tr>
+    <tr><td>Ch 6</td><td>—</td><td>3 months</td></tr>
+    <tr><td>Writing / committee</td><td>—</td><td>6 months</td></tr>
+  </tbody>
+</table>
+
+<p>
+Total realistic time: 5–7 years. This is a long thesis. It's also the
+one most likely to produce a celebrated dissertation if Chapters 2
+and 3 hit.
+</p>
+
+<h3>6.5 Where this competes with existing work</h3>
+
+<p>
+The diffusion-model-for-weather angle is very active. GenCast (Google
+DeepMind), Aurora (Microsoft), and several academic groups are working
+on generative weather models. Your contribution can't be "we built a
+diffusion weather model" because they already exist. The contribution
+has to be deeper:
+</p>
+
+<ul>
+  <li>A theoretical understanding of why diffusion / generative approaches
+    work for this problem and when they don't.</li>
+  <li>A systematic comparison of training objectives that previous work
+    hasn't done.</li>
+  <li>A novel architecture or training recipe that improves on the
+    state of the art.</li>
+</ul>
+
+<p>
+Honestly, this is the option most likely to feel like you're chasing
+industry. Mitigation: focus on the analytical / theoretical parts of
+Chapter 2, which industry doesn't typically publish, and on the
+careful empirical comparisons in Chapter 5, which industry rarely
+does in a thesis-worthy way.
+</p>
+
+<h3>6.6 Failure modes</h3>
+
+<ul>
+  <li>Chapter 2's theory doesn't come together. Mitigation: have a
+    fallback that makes Chapter 2 a careful empirical investigation
+    rather than a theoretical proof.</li>
+  <li>Chapter 4's architecture doesn't beat baselines. Same mitigation
+    as Option B Chapter 3 — make the failure analysis itself the
+    contribution.</li>
+  <li>Industry ships a strictly better version before you can publish.
+    This is the dominant risk. Mitigation: focus on aspects industry
+    doesn't publish (theory, careful comparisons).</li>
+  <li>The thesis takes 7 years. Honestly this is hard to mitigate
+    structurally; the mitigation is psychological — go into Option D
+    knowing this could be a 6–7 year program.</li>
+</ul>
+
+<h3>6.7 Who this fits</h3>
+
+<ul>
+  <li>The student with a strong ML theory background (or strong
+    appetite to develop one).</li>
+  <li>Wants to do ambitious methodological work that could be
+    paradigm-shifting.</li>
+  <li>Wants academic faculty in an ML or applied-ML department.</li>
+  <li>Has very high risk tolerance and a flexible timeline.</li>
+  <li>Has an advisor who can mentor on ML methodology and theory
+    (not just applications) and is comfortable with high-variance
+    research.</li>
+</ul>
+
+<hr>
+
+<h2 id="hybrids">7. Hybrid combinations actually worth considering</h2>
+
+<p class="lede">
+The four options are not exclusive. Several combinations make more
+sense as a thesis than any single option.
+</p>
+
+<h3>7.1 A + B — Evaluation framework grounding a methodological contribution</h3>
+
+<p>
+Take Option A's chapters 1–2 (evaluation framework + decomposition)
+as the empirical foundation, then Option B's chapters 3–4 (novel
+architecture + transfer) as the methodological contribution.
+</p>
+
+<p>
+This is probably the most defensible single thesis shape. The
+evaluation chapters set up the corrective head chapters as solving
+a documented and important problem. The methodological chapters give
+the thesis its central contribution. Total 4 chapters, doable in
+4 years.
+</p>
+
+<h3>7.2 B + D — Theoretical underpinnings for methodological work</h3>
+
+<p>
+Option D's Chapter 2 (theoretical diagnosis) precedes Option B's
+Chapter 3 (novel architecture). The theory motivates the architectural
+choice; the architecture validates the theory.
+</p>
+
+<p>
+This is the strongest combination for an ML methodologist. The
+theoretical insight is principled and the architecture is the
+applied test of the theory. Risk: still 5+ years.
+</p>
+
+<h3>7.3 A + D — Evaluation that motivates a theoretical question</h3>
+
+<p>
+Option A's Chapter 1 (evaluation framework) reveals the
+narrow-distribution problem cross-model, cross-region. Option D's
+Chapters 2–4 (theory + objectives + architectures) address it. Chapter
+5 returns to the evaluation framework to validate.
+</p>
+
+<p>
+Similar to B+D but with a stronger empirical grounding. Good fit if
+your advisor wants substantial empirical work but you want
+methodological depth.
+</p>
+
+<h3>7.4 C as a sequence of papers, A or B as the thesis</h3>
+
+<p>
+A pragmatic option: do Proto 1, Proto 2, Proto 3 as standalone
+publications during the early PhD years. Use them to figure out which
+operational future has the most research-grade potential. Pivot to
+that one (A, B, or D) for the main thesis body.
+</p>
+
+<p>
+This is what many students actually do whether or not they plan to.
+The PhD ends up being a sequence of explorations followed by a
+focused contribution. The risk is that the explorations consume too
+much time and you defend late or with a thinner main contribution.
+</p>
+
+<hr>
+
+<h2 id="failure">8. Failure modes and red flags</h2>
+
+<h3>8.1 Patterns that lead to slow PhDs across all options</h3>
+
+<ul>
+  <li><strong>Endless infrastructure work.</strong> If you're three
+    years in and still mostly building pipelines, you have a problem.
+    The pipeline work in Proto 1 is appropriate for year 1; not for
+    year 3.</li>
+  <li><strong>Scope creep on Chapter N because Chapter N-1 wasn't tight
+    enough.</strong> Each chapter should have a defined endpoint. If
+    you keep going back to add to Chapter 2 while writing Chapter 3,
+    the thesis won't finish.</li>
+  <li><strong>The "I'll write the paper after I finish the analysis"
+    trap.</strong> Analysis without writing expands forever. Write
+    early drafts in parallel with analysis.</li>
+  <li><strong>Avoiding the hardest chapter.</strong> Every option has
+    one chapter that is the hard one. Students often drift away from
+    it. The hard chapter is usually the one that makes the thesis
+    thesis-shaped.</li>
+  <li><strong>Following the model release cycle.</strong> If you keep
+    rerunning everything because there's a new AIFS or GraphCast
+    release, you never finish. Pick a snapshot, document it, and
+    move on. New releases become future-work or robustness checks,
+    not setbacks.</li>
+</ul>
+
+<h3>8.2 Red flags specific to each option</h3>
+
+<p>
+Option A: <em>Three years in with no clear methodological contribution.</em>
+You can grind out evaluations forever; at some point you need
+something the field will cite for the methodology, not just the
+data. If by mid-year-3 you don't have an analytical or methodological
+hook, push toward one.
+</p>
+
+<p>
+Option B: <em>Chapter 3 keeps not working.</em> If at month 18 of
+working on the novel architecture nothing has beaten the MVP,
+seriously consider pivoting Chapter 3's framing to "here is why
+this is hard, here is what doesn't work, here are the conditions
+under which it might." That can be a thesis chapter; "I'm still
+trying" can't.
+</p>
+
+<p>
+Option C: <em>The synthesis chapter doesn't have a clear framework.</em>
+If by year 3 the three preconditions look like three independent
+papers rather than parts of a decision framework, get the framework
+on paper now. If you can't, the thesis is in trouble.
+</p>
+
+<p>
+Option D: <em>Year 4 and no clean theoretical result.</em> The
+theoretical chapter is the highest-variance one. If by year 4 it's
+still in motion, you have to either reframe it as empirical or
+extend the PhD. There is no rescue plan that's quick.
+</p>
+
+<h3>8.3 Red flags about your advisor</h3>
+
+<p>
+These apply regardless of which option you pick:
+</p>
+
+<ul>
+  <li>Advisor consistently uninterested in the technical details of
+    your work.</li>
+  <li>Advisor doesn't push back on weak parts of your drafts.</li>
+  <li>Advisor's other students consistently take 7+ years to defend.</li>
+  <li>Advisor has stopped publishing in your area.</li>
+  <li>Advisor pushes you toward fashionable topics that don't match
+    your interests.</li>
+</ul>
+
+<p>
+If two or more of these apply, the thesis-shape question is less
+important than the advisor question. Solve the advisor question
+first.
+</p>
+
+<hr>
+
+<h2 id="career">9. Career implications and post-PhD landing</h2>
+
+<h3>9.1 The 2026–2030 landscape, briefly</h3>
+
+<p>
+Useful context: the field of "AI applied to weather and climate" is
+rapidly maturing and bifurcating. Three rough tracks:
+</p>
+
+<ul>
+  <li><strong>Industry AI weather/climate.</strong> Google
+    (DeepMind weather), NVIDIA (Earth-2), Microsoft (Aurora), ECMWF
+    (operational AI), and a layer of climate-tech startups
+    (Atmospheric Discovery, Tomorrow.io, Salient, Atmo, etc.).
+    Growing. Pays well. Methodological and engineering work both
+    valued.</li>
+  <li><strong>National labs / NWP centers.</strong> NCAR, NOAA, JPL,
+    ECMWF research, JMA, IMD, UK Met Office. Stable. Long-running
+    research programs. Evaluation and decision-support work both
+    valued.</li>
+  <li><strong>Academic faculty.</strong> Atmospheric science
+    departments increasingly hire ML-oriented faculty. ML/CS
+    departments increasingly accept climate-applied work in their
+    hiring searches. Both routes are open but the specific positioning
+    matters.</li>
+</ul>
+
+<h3>9.2 What each option opens / closes</h3>
+
+<table>
+  <thead>
+    <tr><th>Option</th><th>Strong fits</th><th>Weak fits</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>A</td><td>National lab, operational center, applied
+      industry, atmospheric science faculty</td><td>ML/CS faculty
+      jobs that prize methodological novelty</td></tr>
+    <tr><td>B</td><td>Industry post-processing teams, applied
+      research labs, climate-tech startups, ML/CS faculty</td>
+      <td>Pure atmospheric science faculty (less common but
+      possible)</td></tr>
+    <tr><td>C</td><td>Climate services, policy, national labs,
+      operational center research</td><td>Industry research
+      labs, ML/CS faculty</td></tr>
+    <tr><td>D</td><td>ML/CS faculty, research labs that prize
+      theoretical / methodological depth (Google Brain weather,
+      Microsoft research)</td><td>Operational positions that
+      want shipping-ready people</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3 Publication targets during the PhD</h3>
+
+<p>
+Rough sense of where each option's chapters can land:
+</p>
+
+<p>
+<strong>Option A:</strong>
+</p>
+
+<ul>
+  <li>Ch 1 → <em>BAMS</em> (Bulletin of the AMS), <em>JAMES</em>
+    (Journal of Advances in Modeling Earth Systems).</li>
+  <li>Ch 2 → <em>JAMES</em>, <em>Geoscientific Model Development</em>.</li>
+  <li>Ch 3 → <em>Weather and Forecasting</em>, possibly NeurIPS Climate
+    Change AI workshop.</li>
+  <li>Ch 4 → <em>Bulletin of the AMS</em>, <em>Weather and Forecasting</em>,
+    domain-specific outlets (e.g., agricultural meteorology journals).</li>
+</ul>
+
+<p>
+<strong>Option B:</strong>
+</p>
+
+<ul>
+  <li>Ch 1 → workshop paper at Climate Change AI or AI for Weather.</li>
+  <li>Ch 2 → <em>Weather and Forecasting</em>, <em>JAMES</em>.</li>
+  <li>Ch 3 → NeurIPS, ICML, or a strong climate venue if methodologically
+    novel.</li>
+  <li>Ch 4 → <em>JAMES</em>, <em>Weather and Forecasting</em>.</li>
+  <li>Ch 5 → applied / industry venues.</li>
+</ul>
+
+<p>
+<strong>Option C:</strong>
+</p>
+
+<ul>
+  <li>Each of Ch 2/3/4 → <em>Weather and Forecasting</em>, <em>JAMES</em>,
+    or workshop papers.</li>
+  <li>Ch 5 → <em>BAMS</em> review-style paper, <em>Nature Reviews
+    Earth & Environment</em>.</li>
+</ul>
+
+<p>
+<strong>Option D:</strong>
+</p>
+
+<ul>
+  <li>Ch 2 → NeurIPS or ICML if the theory is clean, otherwise
+    <em>JAMES</em>.</li>
+  <li>Ch 3, Ch 4 → NeurIPS / ICML / ICLR.</li>
+  <li>Ch 5 → <em>JAMES</em>.</li>
+</ul>
+
+<p>
+Most students publish 3–5 papers during a PhD. The publication count
+and venue mix matter for academic jobs more than for industry. Industry
+mostly cares about the work itself.
+</p>
+
+<hr>
+
+<h2 id="sixmonth">10. What to do in the next six months regardless</h2>
+
+<p class="lede">
+The most useful concrete advice in this document: there is a sequence
+of moves that helps regardless of which option you eventually pick.
+</p>
+
+<h3>10.1 Months 1–2: finish Proto 1 properly</h3>
+
+<ul>
+  <li>Finish the 122-day AIFS batch. ~$15 more GPU.</li>
+  <li>Re-run the analysis and finalize all seven figures.</li>
+  <li>Add bootstrap confidence intervals to the bin-level findings.</li>
+  <li>Add a land mask to the maps.</li>
+  <li>Polish <code>WRITEUP.md</code> into a draft workshop paper. Target:
+    Climate Change AI workshop at NeurIPS 2026 or the AI for Weather
+    workshop, whichever has the right deadline.</li>
+</ul>
+
+<p>
+End state: a defendable, publishable artifact that's done.
+</p>
+
+<h3>10.2 Months 2–4: build the corrective head MVP</h3>
+
+<ul>
+  <li>Implement the LightGBM tabular MVP from the immediate
+    follow-on plan.</li>
+  <li>Train on India 2025, evaluate on a held-out region.</li>
+  <li>Compare against raw AIFS using the Proto 1 diagnostics.</li>
+  <li>Write up as a second workshop paper or as the start of a
+    methods-track journal paper.</li>
+</ul>
+
+<p>
+This is roughly the Option B Chapter 2 work. It also serves as the
+sanity check for whether Option B's full thesis is right for you: if
+you find this work satisfying and the headline metric improves
+meaningfully, B becomes much more plausible.
+</p>
+
+<h3>10.3 Months 3–4 (in parallel): the smoke tests</h3>
+
+<ul>
+  <li>Run the ACE2 smoke test (30 minutes + a 4-hour rollout). Look at
+    its monsoon climatology. This tells you whether Option C's Chapter
+    4 (climate emulator) is even possible.</li>
+  <li>Run a perturbed-IC ensemble of 5 deterministic AIFS runs and
+    compute CRPS for a few dates. This tells you whether Option C's
+    Chapter 3 (regime-conditioned ensemble) is tractable on your
+    budget.</li>
+  <li>Either of these is two days of work. Doing both lets you make
+    informed decisions about Option C without committing to it.</li>
+</ul>
+
+<h3>10.4 Months 4–6: pick a direction</h3>
+
+<p>
+By month 6, you should have:
+</p>
+
+<ul>
+  <li>A finished Proto 1 with a draft paper.</li>
+  <li>A working corrective head MVP with results.</li>
+  <li>Smoke-test results on ACE2 and on ensemble construction.</li>
+  <li>A clear sense of which of these felt most rewarding to work on.</li>
+</ul>
+
+<p>
+Make the thesis-direction decision after this point, not before.
+The data from the six-month period will tell you which option fits
+your taste much more reliably than abstract reasoning ever could.
+</p>
+
+<h3>10.5 The bonus item — talk to people</h3>
+
+<p>
+Independently of the technical work above, spend a few hours each
+month doing the following:
+</p>
+
+<ul>
+  <li>Read one paper each from Lam et al. (GraphCast), Pathak et al.
+    (FourCastNet), Bouallègue et al. (probabilistic evaluation of AI
+    weather), Vannitsem (statistical post-processing), and Watt-Meyer
+    (ACE2). These are the canonical references.</li>
+  <li>Email two or three authors of papers you found interesting and
+    ask short, specific questions. This builds connections that matter
+    later.</li>
+  <li>Find one or two PhD students at other institutions working on
+    adjacent things. Discord/Slack channels exist (AI for Science,
+    Climate Change AI). The peer network is enormously useful and
+    most students underinvest in it.</li>
+</ul>
+
+<hr>
+
+<h2 id="close">11. Closing: how to actually decide</h2>
+
+<p>
+If I had to give the single most useful piece of advice in this
+document, it would be this:
+</p>
+
+<blockquote>
+The thesis-shape decision is less important than getting good at the
+day-to-day work that the option requires. Pick the option whose
+day-to-day work — the actual hours-spent-doing-things — most matches
+the kind of researcher you want to become. Then trust that the
+research will sort itself out as long as you keep producing real
+artifacts.
+</blockquote>
+
+<p>
+Concretely:
+</p>
+
+<ul>
+  <li>If you find yourself energized by running careful comparisons
+    and producing diagnostic figures, you're an Option A person.</li>
+  <li>If you find yourself energized by training new models and
+    making things work better, you're an Option B person.</li>
+  <li>If you find yourself energized by the meta-question of how
+    methods should be chosen, you're an Option C person.</li>
+  <li>If you find yourself energized by reading theory papers and
+    asking why things work the way they do, you're an Option D
+    person.</li>
+</ul>
+
+<p>
+The next six months will tell you which of these descriptions
+actually fits you. Don't decide before then. And don't decide based
+on what would impress a hypothetical committee — decide based on
+what you find yourself wanting to do at 11pm on a Sunday.
+</p>
+
+<p>
+The PhD is long. The only thing that gets you through it sustainably
+is doing work you actually want to do.
+</p>
+
+<footer>
+  Source repo: <a href="https://github.com/n0ndescript/forecasting-proto-1">github.com/n0ndescript/forecasting-proto-1</a>
+  &nbsp;·&nbsp;
+  Companion docs: <a href="phd-trajectory.html">phd-trajectory.html</a>, <code>WRITEUP.md</code>, <code>PROCESS.md</code>, <code>STATUS.md</code>
+</footer>
+
+</div>
+</body>
+</html>
