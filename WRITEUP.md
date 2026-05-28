@@ -1,7 +1,7 @@
 # Does AIFS bias over the Indian monsoon have learnable structure?
 
-**Status:** Preliminary — 23 of 122 forecast days analyzed; batch still running on H100.
-The headline structure is already clear and unlikely to change.
+**Status:** 50 of 122 forecast days analyzed (~41 % of season).
+The headline structure is robust to additional days.
 **Author:** Siddharth Vijayakrishnan · **Date:** 2026-05-28
 
 ---
@@ -12,11 +12,12 @@ The precondition for a corrective-head follow-on is met. Across three independen
 stratifications, AIFS's precipitation bias over India shows **structured,
 geographically coherent, and physically interpretable patterns** — not white noise.
 
-- **By rainfall magnitude:** AIFS over-predicts trace and light rain (+1.99 / +3.52
-  mm/day) and under-predicts heavy and very-heavy events (−27.47 / −75.44 mm/day).
+- **By rainfall magnitude:** AIFS over-predicts trace and light rain (+2.46 / +4.29
+  mm/day) and under-predicts heavy and very-heavy events (−26.14 / −77.65 mm/day).
   This is the canonical "narrow predictive distribution" failure mode.
 - **By elevation:** AIFS is dry over the Gangetic plain and consistently wet over
-  every elevation bin above 500 m. Linear fit: **+0.83 mm/day per km of elevation**.
+  every elevation bin above 500 m (+1.98 to +2.55 mm/day). Linear fit:
+  **≈ +0.8 mm/day per km of elevation**.
 - **By region:** Wet over the Himalayan foothills and the leeward Western Ghats;
   dry on the Western Ghats windward face. These are exactly the regions where a
   ~25 km global model's smoothed orography fails the hardest.
@@ -53,8 +54,9 @@ clear structure, a corrective head is justified.
   lon 68–98°E). Conservative regridding is mandatory for precipitation —
   bilinear silently breaks mass conservation.
 
-**Status snapshot at writing:** 23 / 122 AIFS forecasts complete; 121 / 122
-IMERG and 121 / 122 ERA5 days populated in the master Zarr cube.
+**Status snapshot at writing:** 50 / 122 AIFS forecasts complete (covering 2025
+Jun 1 – Jul 26 plus mid-July gaps from the GPU batch's two infra interruptions);
+121 / 122 IMERG and 121 / 122 ERA5 days populated in the master Zarr cube.
 (The one missing IMERG day is 2025-09-30 — half-hourly granules not yet fully
 published as of late May 2026.)
 
@@ -64,8 +66,8 @@ published as of late May 2026.)
 
 ![Three-panel bias decomposition](outputs/figures/03_three_panel_aifs_era5_residual.png)
 *Figure 1. AIFS − IMERG (left), ERA5 − IMERG (middle), and the AIFS − ERA5
-residual (right). 21-day sample. All three panels share a symmetric ±15 mm/day
-color scale. Note the residual is not flat — AIFS departs from its training
+residual (right). 50-day sample. All three panels share a symmetric color
+scale. Note the residual is not flat — AIFS departs from its training
 distribution in coherent ways.*
 
 The AIFS bias map shows three signatures simultaneously:
@@ -99,8 +101,8 @@ days, slightly under-predicts moderate events, and **catastrophically
 under-predicts heavy and very-heavy events** (mean −27 and −75 mm/day in those
 bins).
 
-The sample is substantial in every bin including the tail (n = 12,398 for heavy,
-n = 4,080 for very heavy). This isn't a few outlier cells — it's a systematic
+The sample is substantial in every bin including the tail (n = 36,063 for heavy,
+n = 10,124 for very heavy). This isn't a few outlier cells — it's a systematic
 narrowing of the precipitation distribution. The same pattern appears in
 virtually every global AI weather model evaluated against radar / gauge truth in
 the recent literature, but it's particularly stark over the monsoon.
@@ -113,10 +115,10 @@ which is the highest-value calibration problem in monsoon nowcasting.
 ## Finding 3 — Orographic structure
 
 The elevation stratification (Figure 3 — `05_bias_by_elevation_aifs.png`) shows
-AIFS is dry over plains (−1.75 mm/day, n = 207k cell-days), wet at every higher
-elevation bin (+1.36 to +2.50). The hexbin scatter
+AIFS is dry over plains (−1.55 mm/day, n = 493k cell-days), wet at every higher
+elevation bin (+1.98 to +2.55). The hexbin scatter
 (`06_bias_vs_elevation_scatter_aifs.png`) yields a linear fit of
-**+0.83 mm/day per km of elevation**: AIFS systematically overshoots rainfall
+**≈ +0.8 mm/day per km of elevation**: AIFS systematically overshoots rainfall
 the higher the terrain.
 
 This is consistent with AIFS's underlying O96 reduced-Gaussian internal grid
@@ -129,10 +131,12 @@ corrective head can supply.
 
 ## Limitations
 
-- **Sample size.** Only 23 / 122 forecast days at the time of writing. The
-  remaining 99 are in flight on an H100 SXM and will complete in ~3 hr. We
-  expect the magnitudes to tighten slightly and the spatial maps to smooth, but
-  the qualitative structure won't change.
+- **Sample size.** 50 / 122 forecast days at the time of writing (covering Jun 1
+  – Jul 26 with a few mid-July gaps from two GPU-batch infra interruptions —
+  see the resume checklist in `STATUS.md`). Moving from 21 → 50 days
+  sharpened the wet-side magnitudes and left the dry tail bins almost
+  unchanged, suggesting the headline structure is robust. The remaining
+  72 forecasts can be added with a couple more GPU sessions.
 - **No land mask yet.** Ocean cells are included in the figures. IMERG quality
   over ocean differs from land; the map figures should be re-rendered with a
   land mask before submission.
