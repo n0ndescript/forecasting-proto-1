@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proto 1 → PhD: an honest take</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #595959;
+    --accent: #b0341e;
+    --bg: #fafaf7;
+    --rule: #d8d6cf;
+  }
+  html { font-size: 17px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Iowan Old Style", "Charter", "Georgia", serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 6rem;
+  }
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-style: italic;
+  }
+  h2 {
+    font-size: 1.15rem;
+    margin: 2.5rem 0 0.6rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  h3 {
+    font-size: 1rem;
+    margin: 1.8rem 0 0.4rem;
+    font-weight: 600;
+  }
+  p { margin: 0 0 1rem; }
+  ul, ol { padding-left: 1.4rem; }
+  li { margin-bottom: 0.5rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  code {
+    font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    font-size: 0.88em;
+    background: #eeece5;
+    padding: 0 0.25em;
+    border-radius: 3px;
+  }
+  .lede {
+    font-size: 1.15rem;
+    line-height: 1.55;
+    color: var(--fg);
+    margin-bottom: 1.4rem;
+  }
+  .option {
+    border-left: 3px solid var(--rule);
+    padding: 0.8rem 1.1rem;
+    margin: 1.2rem 0;
+    background: #f3f1ea;
+  }
+  .option-label {
+    display: inline-block;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  footer a {
+    color: var(--muted);
+    text-decoration: underline;
+  }
+  blockquote {
+    margin: 1.4rem 0;
+    padding: 0.6rem 1.1rem;
+    border-left: 3px solid var(--accent);
+    background: #f8f3ed;
+    color: var(--fg);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Proto 1 → PhD: an honest take</h1>
+  <div class="meta">Companion note to <code>WRITEUP.md</code> and <code>PROCESS.md</code> · 2026-05-28</div>
+</header>
+
+<p class="lede">
+<strong>Proto 1 alone is not a PhD. And the perplexity you're feeling is correct, not a problem.</strong>
+</p>
+
+<p>
+What Proto 1 actually is: roughly three days of focused engineering that
+validates a precondition for a research program. It demonstrates you can
+stand up a real ML pipeline, make and defend technical choices, recover from
+infrastructure obstacles, and produce clear scientific findings. That is
+<em>qualifying-exam-shaped</em> work. It is the seedcorn for a thesis, not the
+thesis itself.
+</p>
+
+<h2>Three reasons not to worry about the gap</h2>
+
+<ol>
+  <li>
+    <strong>It should feel like the start of a road, not the end of one.</strong>
+    If Proto 1 felt like enough for a PhD, you would either be vastly
+    overestimating what you built today or vastly underestimating what a PhD
+    needs to be. The reaction <em>"this is interesting but I don't see how it
+    is three more years of work"</em> is exactly the reaction a healthy
+    first-year would have at this stage.
+  </li>
+  <li>
+    <strong>You replicated a known pattern in a new domain.</strong> AI weather
+    models are known in the literature to have narrow predictive distributions
+    (Bouallègue 2024; Lam 2023 on GraphCast; Bonev 2023 on FourCastNet). You
+    have shown this specifically for AIFS over the Indian monsoon. That is
+    <em>incremental</em> contribution — worth a workshop paper or a section of
+    a journal article. It is not, by itself, a thesis.
+  </li>
+  <li>
+    <strong>The thesis is what comes next, fanning out from this point.</strong>
+    Proto 1 is the seed. The thesis is the program of work that grows from it.
+  </li>
+</ol>
+
+<h2>What that program of work plausibly looks like</h2>
+
+<p>
+A few candidate shapes; pick one or hybridize. None are right or wrong —
+each is a defensible doctoral path, and which one is best depends on which
+question grabs you and which adviser you have.
+</p>
+
+<div class="option">
+  <div class="option-label">Option A — AI weather model evaluation for tropical convective systems</div>
+  <p style="margin-bottom: 0.6rem;">~4 chapters; the most direct extension.</p>
+  <ul style="margin-bottom: 0;">
+    <li><strong>Ch 1.</strong> Bias evaluation framework — multi-model
+      (AIFS + GraphCast + Pangu + maybe FourCastNet-Spherical),
+      multi-year (5+ years), multi-region (Indian + West African + Maritime
+      Continent monsoons).</li>
+    <li><strong>Ch 2.</strong> Causal decomposition — what <em>drives</em>
+      the bias? Loss-function ablation, training-data smoothing,
+      architectural comparison.</li>
+    <li><strong>Ch 3.</strong> Corrective head as a downstream remedy.</li>
+    <li><strong>Ch 4.</strong> Transfer / cross-region generalization of
+      corrective heads.</li>
+  </ul>
+  <p style="margin: 0.6rem 0 0;">Evaluation-heavy. Some committees love it,
+    some say it is not architecturally novel enough. ~3 years.</p>
+</div>
+
+<div class="option">
+  <div class="option-label">Option B — Corrective heads as a methodological contribution</div>
+  <p style="margin-bottom: 0.6rem;">~4–5 chapters; the most product-shaped path.</p>
+  <ul style="margin-bottom: 0;">
+    <li><strong>Ch 1.</strong> Motivation — Proto 1 condensed.</li>
+    <li><strong>Ch 2.</strong> Tabular MVP plus ablations (loss functions,
+      feature sets, region holdouts).</li>
+    <li><strong>Ch 3.</strong> Novel architecture — spatial-temporal context,
+      possibly diffusion-based generative correction that handles the tail
+      miscalibration properly.</li>
+    <li><strong>Ch 4.</strong> Cross-model, cross-region transfer.</li>
+    <li><strong>Ch 5.</strong> Operational deployment / cost-benefit / what
+      this means for end users.</li>
+  </ul>
+  <p style="margin: 0.6rem 0 0;">Methodologically novel if Ch 3 actually
+    produces something new. Risk: if the v1 MVP works "well enough," there
+    is less room for chapters 3–5 to differ meaningfully.</p>
+</div>
+
+<div class="option">
+  <div class="option-label">Option C — The Hunt-shaped "diagnostic studies" thesis</div>
+  <p style="margin: 0;">Proto 1 + Proto 2 + Proto 3 + a synthesis chapter
+    that compares them + a "what to build" chapter. A doctoral committee
+    might respond <em>"interesting survey, but where is your contribution?"</em>
+    or might respond positively to the breadth. Depends on the committee.</p>
+</div>
+
+<div class="option">
+  <div class="option-label">Option D — A more architectural / theoretical pivot</div>
+  <p style="margin: 0;">Start from Proto 1's finding that AIFS produces a
+    conditional-mean predictor (narrow distribution). The <em>interesting</em>
+    PhD question buried here is <strong>why?</strong> Is it the MSE training
+    objective? The lack of stochasticity in the architecture? The smoothed
+    training data? Each is a real research question. A thesis along these
+    lines reframes the work as fundamental methodology rather than applied
+    evaluation.</p>
+</div>
+
+<h2>What to actually do at the moment</h2>
+
+<p>
+The pragmatic move right now is <strong>probably not</strong> to commit to
+one of these. Pick one or two candidate chapters from any of the above (most
+obvious: corrective head MVP + multi-model evaluation), do the work, see
+what's interesting. The thesis shape will reveal itself in 6–12 months as
+you figure out which question grabs you most and where the most non-obvious
+results live.
+</p>
+
+<h2>One more thing worth saying</h2>
+
+<p>
+Hunt almost certainly knows Proto 1 alone is not a PhD. He is framing it as
+<em>"do this, see what you find, then we figure out what's worth scaling
+up."</em> That is a healthy mentorship pattern — short prototypes to test
+directions before committing to multi-year programs. Your job at this stage
+isn't to make Proto 1 into a thesis; it is to figure out which follow-on
+most plausibly <em>could</em> become a thesis chapter, and produce that
+thing next.
+</p>
+
+<blockquote>
+If I had to bet on which follow-on most cleanly extends Proto 1 into
+research-shaped work, it is the <strong>corrective head with multi-model
+and multi-region transfer evaluation</strong> — because it combines a
+tangible deliverable, a novel-enough methodological contribution (transfer
+learning for weather model correction is not well-explored), and direct
+exploitation of the structure you just found. That is likely two chapters
+of an eventual thesis.
+</blockquote>
+
+<p>
+Happy to keep talking about any of this — including pushing back if you
+think I'm being too pessimistic or too prescriptive about thesis shape.
+</p>
+
+<footer>
+  Source repo: <a href="https://github.com/n0ndescript/forecasting-proto-1">github.com/n0ndescript/forecasting-proto-1</a>
+  &nbsp;·&nbsp;
+  Companion docs: <code>WRITEUP.md</code>, <code>PROCESS.md</code>, <code>STATUS.md</code>
+</footer>
+
+</div>
+</body>
+</html>
