@@ -82,6 +82,13 @@ When provisioning a new GPU host (RunPod or otherwise), these things bit us; fix
 7. **`pgrep -f "<short string>"` matches its own enclosing bash subshell** if the subshell's command line contains the same string. For PID polling, use `kill -0 $PID` with a saved PID file, not `pgrep -f`.
 8. **`NetCDF4Backend` creates the output file before the run starts** — if the run crashes mid-fetch, you're left with an empty ~240-byte skeleton that subsequent attempts will silently re-use. `run_aifs.py` now refuses files smaller than 1 MB (size sanity check).
 9. **Earth2Studio's `ARCO` data source has a hardcoded `< 2023-11-10` cutoff** in `_validate_time` (their snapshot freeze), even though the live `gcp-public-data-arco-era5` bucket has data well past it (verified to 2026-04). `_patch_arco_date_cutoff()` in `run_aifs.py` lifts the check — but ARCO turned out to also be missing lexicon entries for surface/soil vars, so we use CDS anyway. Patch retained in case we want ARCO later for non-AIFS models.
+10. **Earth2Studio caches ARCO chunks to `~/.cache/earth2studio` and never evicts.** On RunPod the container `/` is small (30 GB); each forecast pulls ~5 GB of pressure-level chunks. The cache filled the container disk after ~23 consecutive forecasts on 2026-05-28, killing the batch with `OSError: [Errno 28] No space left on device`. **Fix before any multi-day batch:** symlink the cache to the volume before launching:
+    ```bash
+    rm -rf /root/.cache/earth2studio
+    mkdir -p /workspace/proto-1/.cache/earth2studio
+    ln -s /workspace/proto-1/.cache/earth2studio /root/.cache/earth2studio
+    ```
+    The volume (148 TB) absorbs the cache indefinitely. Also: the empty NetCDF4Backend "skeleton" files (239 B / 48 B) left by ENOSPC-aborted runs need explicit deletion before resume — script 04's `if not path.exists()` skip would otherwise treat them as complete.
 
 ## Workarounds we navigated
 
