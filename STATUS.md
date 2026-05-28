@@ -1,6 +1,6 @@
 # Monsoon Bias Prototype — Session Status
 
-Snapshot as of 2026-05-25.
+Snapshot as of 2026-05-27.
 
 ## What's working end-to-end
 
@@ -9,15 +9,15 @@ Snapshot as of 2026-05-25.
 | `scripts/01_test_credentials.py` | runs on laptop | Downloads 1 day of ERA5 t2m + 1 day IMERG daily, plots on India map |
 | `scripts/02_download_one_date.py` | **green end-to-end** (cache-aware: needs GPU only if forecast NetCDF absent) | Full one-date pipeline: IMERG half-hourly → mm/day, ERA5 hourly tp → mm/day, AIFS 96-h → 4 × tp06 → mm/day, conservative regrid, 3-panel + bias plot |
 | `scripts/03_download_all.py` | implemented; not yet exercised at full scale | Batch IMERG + ERA5 for the season, populates the Zarr store, resumable |
-| `scripts/04_run_forecasts.py` | implemented; needs GPU pod | 122 AIFS forecasts with per-forecast trim built in (7.2 GB → 36 MB) |
+| `scripts/04_run_forecasts.py` | **16/122 done** (1 + 3 smoke + 12 batch); `--limit N` for time-boxed sessions | 122 AIFS forecasts with per-forecast trim built in (7.2 GB → 37 MB) |
 | `scripts/05_compute_bias.py` | stub | Mean bias, RMSE, elevation/region/rainfall-magnitude stratifications |
 | `scripts/06_make_plots.py` | stub | Six publication-quality Cartopy figures |
 | `scripts/test_trim.py` | one-shot validator | Bytes-compares trimmed vs untrimmed accumulator output |
 
 All `src/monsoon_bias/` modules either implemented or have detailed docstring stubs:
 
-- **Implemented:** `config.py`, `data/_earthdata.py`, `data/imerg.py`, `data/era5.py`, `processing/accumulate.py`, `processing/regrid.py`, `forecast/run_aifs.py`, `forecast/trim.py`
-- **Stubbed:** `data/bsiso.py`, `data/elevation.py`, `processing/store.py`, `analysis/bias.py`, `analysis/plots.py`
+- **Implemented:** `config.py`, `data/_earthdata.py`, `data/imerg.py`, `data/era5.py`, `processing/accumulate.py`, `processing/regrid.py`, `processing/store.py`, `forecast/run_aifs.py`, `forecast/trim.py`
+- **Stubbed:** `data/bsiso.py`, `data/elevation.py`, `analysis/bias.py`, `analysis/plots.py`
 
 ## Concrete results
 
@@ -74,7 +74,7 @@ When provisioning a new GPU host (RunPod or otherwise), these things bit us; fix
 
 1. **Pin torch to a version that has pre-built `flash_attn` wheels.** Our `torch>=2.2` constraint let uv pull the latest (2.12.0 with CUDA-13 wheels), which mismatched the pod's CUDA-12.8 toolkit. Reinstalling with `--index-url https://download.pytorch.org/whl/cu128` brought it to 2.11.0+cu128 — but `flash_attn` doesn't publish pre-built wheels for torch 2.11+cu128, so we had to compile from source (~30 min on H100 across 4 GPU archs, ~10 min restricted to sm_90 only). For this prototype we downgraded to **torch 2.8.0+cu128** and grabbed the matching pre-built wheel from <https://github.com/Dao-AILab/flash-attention/releases/tag/v2.8.3> (instant). **Fix in pyproject.toml:** narrow to `torch>=2.7,<=2.8` and add the wheel index in install instructions.
 2. **Set `FLASH_ATTN_CUDA_ARCHS=90` (or target arch) before any source build.** Default compiles for sm_80, sm_90, sm_100, sm_120 — 4× the work for nothing.
-3. **Include `earth2studio[aifs]` in the gpu extra.** Plain `earth2studio` doesn't pull `anemoi.inference`, `anemoi.models`, `earthkit.regrid`, `ecmwf.opendata` — AIFS won't import without those.
+3. **Include `earth2studio[aifs]` in the gpu extra *and* pin `anemoi-inference` separately.** `earth2studio[aifs]>=0.14` pulls `anemoi-models`, `earthkit-regrid`, and `ecmwf-opendata` — but *not* `anemoi-inference`, which AIFS actually needs to run. Hit on 2026-05-27 resume. The `[gpu]` extra now pins `anemoi-inference>=0.11` explicitly.
 4. **`uv` resolved `earth2studio==0.9.0` for us, not the latest (0.14.0).** The latter wants `numpy 2.x` + `zarr 3.x` + `pandas` downgrade, conflicting with our pins. v0.9.0's CDS lexicon is missing 23 of AIFS's 94 inputs (all `w*` pressure-level vars + 10 surface/soil); v0.14.0's lexicon has them. We patch v0.9.0's lexicon at runtime via `src/monsoon_bias/forecast/_lexicon_patch.py` — clean module copying the 22 lookup-strings verbatim from v0.14.0's source plus one derived entry for `zsl` (AIFS's name for surface geopotential). **Fix for next bootstrap:** either pin `earth2studio==0.14.0` (and accept the dep upheaval, but watch zarr 3 vs our store code), or keep the patch.
 5. **Use `set -eu` *without* `pipefail` in bash scripts that include `command | head`.** `nvidia-smi | head -15` triggers SIGPIPE; `pipefail` kills the script. Already fixed in `scripts/00_gpu_setup.sh`.
 6. **Anchor rsync excludes with a leading slash** to avoid matching `data` at any depth. `--exclude='data'` will *also* nuke `src/monsoon_bias/data/` along with the top-level `data/` dir. Use `--exclude='/data'` (anchored).
@@ -156,29 +156,55 @@ data/forecasts/
   aifs_20250712T0300_nsteps16.trimmed.nc   36 MB  (side-file trim, validated)
 ```
 
-## Resume checklist (paused 2026-05-25 PM, pod stopped)
+## Session log — 2026-05-27 (H100 resumed; B3 partial; IMERG/ERA5 confirmed populated)
 
-### Next session — order of operations
+### What got done
 
-1. **Migrate pod to GPU** via RunPod's "Automatically migrate" option (gets a new H100 with same data volume).
-2. **Verify in-place trim** on the existing 6.8 GB cached forecast:
-   ```bash
-   cd /workspace/proto-1
-   uv run python -c "
-   from pathlib import Path
-   from monsoon_bias.forecast.trim import trim_aifs_forecast
-   p = Path('data/forecasts/aifs_20250712T0300_nsteps16.nc')
-   trim_aifs_forecast(p, out_path=p)
-   print(p.stat().st_size / 1e6, 'MB')
-   "
-   ```
-3. **Re-run B2** post-trim to confirm the cached, trimmed forecast still produces an identical figure (regression check).
-4. **B3: launch script 04** for the full 122-forecast batch.
-   - Wall clock: ~2 min/forecast × 122 ≈ 4 hr on H100 SXM at $2.90/hr ≈ **$12**.
-   - Disk: ~4.5 GB total (trimmed). Comfortably fits.
-5. After B3: implement scripts 05 (`compute_bias`) and 06 (`make_plots`) — currently stubs.
+1. **Resumed on H100 SXM** in US-MO-1 (RunPod Pytorch 2.8.0 template, `fair_lavender_asp_volume` attached at `/workspace`). Env survived from prior pod stop — torch 2.8.0+cu128, flash_attn 2.8.3, earth2studio 0.14.0 all intact.
+2. **Discovered missing dep: `anemoi-inference` is NOT pulled by `earth2studio[aifs]>=0.14`.** Manually installed (0.11.0) and pinned in `pyproject.toml` `[gpu]` extra so the next bootstrap doesn't repeat the find.
+3. **In-place trim verified.** Trimmed the cached 7.20 GB `aifs_20250712T0300_nsteps16.nc` in-place → 37.4 MB (193×). IMD-day totals byte-identical to the pre-existing side-file `.trimmed.nc` reference (max abs diff = 0.0 mm/day). The remaining untested item from 2026-05-25 is now green.
+4. **B2 regression check passed.** `scripts/02_download_one_date.py` with the trimmed forecast produces identical numbers: IMERG 7.48 / ERA5 7.76 / **AIFS 8.88 mm/day mean over India**, matching 2026-05-25's run exactly.
+5. **`scripts/04 --limit N`.** Added a `--limit` flag so time-boxed GPU sessions can run a subset; resumability already handles continuation.
+6. **Smoke test (3 forecasts, --limit 3):** 3/3 succeeded in 8.5 min wall clock.
+7. **B3 batch (12 forecasts, --limit 12):** 12/12 succeeded in 35.8 min wall clock.
+8. **Confirmed local Zarr already has 121/122 days of IMERG + ERA5** populated from a prior session that wasn't captured in STATUS.md. Only 2025-09-30 is missing (the known IMERG-not-fully-published issue). Script 03 effectively done.
 
-### Cost so far: ~$10 GPU + ~$1 storage from prior sessions; today added pennies (CPU pod).
+### Per-forecast wall clock (network-volume H100 SXM)
+
+Variance is real: cold-start #1 took 5.4 min (process boot + CUDA kernel warmup + ARCO cold cache). Steady-state spread from 1.8 min → 4.2 min depending on ARCO chunk latency + network volume I/O. **Mean ~2.5–3 min** rather than the optimistic ~2 min STATUS.md had been quoting. Re-estimating the full 122 batch at this rate: ~6 hr (not 4) on H100 SXM.
+
+### Pod state at end of session (stopped)
+
+```
+data/forecasts/                       16 AIFS NetCDFs trimmed to ~37 MB each (~590 MB total)
+  aifs_20250712T0300_nsteps16.nc                       (in-place trimmed)
+  aifs_20250712T0300_nsteps16.trimmed.nc               (side-file, original validation reference)
+  aifs_20250712T0300_nsteps16.trimmed.nc.refbackup     (preserved during in-place test; can delete)
+  aifs_20250529T0300..20250612T0300_nsteps16.nc       (15 fresh from smoke + batch)
+```
+
+`/workspace/proto-1` on the pod is still not a git checkout — it's the original rsync tree. We're patching it via `scp` for the rare local edits we want to push to the pod. Cleanup item.
+
+### Cost this session: ~$2.50 (38 min of H100 SXM at $3.29/hr + storage). Cumulative: ~$14.50.
+
+## Resume checklist (paused 2026-05-27 PM, pod stopped)
+
+### Two independent tracks, run in either order
+
+**GPU track (106 AIFS forecasts left):**
+
+1. Resume H100 SXM pod, attach same volume in US-MO-1.
+2. `cd /workspace/proto-1 && uv run python scripts/04_run_forecasts.py --limit N` — pick `N` from your budget at ~3 min/forecast.
+3. Remaining 106 forecasts × ~3 min ≈ **5–6 hr on H100 SXM, ~$17**. Splittable across multiple sessions; script 04 is resumable.
+
+**Laptop track (analysis pipeline, no GPU):**
+
+1. **AIFS → Zarr sweep** (~50 LoC, new script or extension of script 03). Pull the trimmed AIFS NetCDFs from the pod (`scp ... data/forecasts/*.nc`), read each, accumulate to IMD-day (`accumulate.accumulate_aifs_to_imd_day`), regrid (`regrid.regrid_precip`), write to Zarr (`store.write_day(..., aifs=...)`).
+2. **`data/elevation.py`** (~50 LoC): download ETOPO1, coarsen to 0.25°.
+3. **`analysis/bias.py`** (~150 LoC): the six stub functions are well-specified by docstrings + `config.REGIONS` / `ELEVATION_BINS_M` / `RAINFALL_BINS_MM`. Cheapest land mask: treat IMERG-NaN as ocean.
+4. **`analysis/plots.py` + `scripts/05` + `scripts/06`** (~300 LoC): six figures via cartopy + cmocean, thin orchestrators in 05/06.
+
+Bias maps will be partial until all 122 AIFS forecasts are in (currently 16/122). But the analysis modules can be developed + smoke-tested against the partial cube — `mean_bias_map(aifs - imerg)` works on any subset of populated days.
 
 ## Stack snapshot
 
