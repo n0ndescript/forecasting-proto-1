@@ -1,6 +1,6 @@
 # Monsoon Bias Prototype — Session Status
 
-Snapshot as of 2026-05-27.
+Snapshot as of 2026-05-28.
 
 ## What's working end-to-end
 
@@ -10,14 +10,15 @@ Snapshot as of 2026-05-27.
 | `scripts/02_download_one_date.py` | **green end-to-end** (cache-aware: needs GPU only if forecast NetCDF absent) | Full one-date pipeline: IMERG half-hourly → mm/day, ERA5 hourly tp → mm/day, AIFS 96-h → 4 × tp06 → mm/day, conservative regrid, 3-panel + bias plot |
 | `scripts/03_download_all.py` | implemented; not yet exercised at full scale | Batch IMERG + ERA5 for the season, populates the Zarr store, resumable |
 | `scripts/04_run_forecasts.py` | **16/122 done** (1 + 3 smoke + 12 batch); `--limit N` for time-boxed sessions | 122 AIFS forecasts with per-forecast trim built in (7.2 GB → 37 MB) |
-| `scripts/05_compute_bias.py` | stub | Mean bias, RMSE, elevation/region/rainfall-magnitude stratifications |
-| `scripts/06_make_plots.py` | stub | Six publication-quality Cartopy figures |
+| `scripts/04b_ingest_aifs.py` | runs on laptop | Idempotent sweep: trimmed AIFS NetCDFs → IMD-day → regrid → Zarr `aifs` var |
+| `scripts/05_compute_bias.py` | runs on laptop | 8 NetCDFs of bias diagnostics under `outputs/bias/` |
+| `scripts/06_make_plots.py` | runs on laptop | 7 publication PNGs (300 DPI) under `outputs/figures/` |
 | `scripts/test_trim.py` | one-shot validator | Bytes-compares trimmed vs untrimmed accumulator output |
 
 All `src/monsoon_bias/` modules either implemented or have detailed docstring stubs:
 
-- **Implemented:** `config.py`, `data/_earthdata.py`, `data/imerg.py`, `data/era5.py`, `processing/accumulate.py`, `processing/regrid.py`, `processing/store.py`, `forecast/run_aifs.py`, `forecast/trim.py`
-- **Stubbed:** `data/bsiso.py`, `data/elevation.py`, `analysis/bias.py`, `analysis/plots.py`
+- **Implemented:** `config.py`, `data/_earthdata.py`, `data/imerg.py`, `data/era5.py`, `data/elevation.py`, `processing/accumulate.py`, `processing/regrid.py`, `processing/store.py`, `forecast/run_aifs.py`, `forecast/trim.py`, `analysis/bias.py`, `analysis/plots.py`
+- **Stubbed:** `data/bsiso.py` (deferred — no live index source)
 
 ## Concrete results
 
@@ -187,24 +188,65 @@ data/forecasts/                       16 AIFS NetCDFs trimmed to ~37 MB each (~5
 
 ### Cost this session: ~$2.50 (38 min of H100 SXM at $3.29/hr + storage). Cumulative: ~$14.50.
 
-## Resume checklist (paused 2026-05-27 PM, pod stopped)
+## Session log — 2026-05-28 (full pipeline online; B3 batch running)
 
-### Two independent tracks, run in either order
+### What got done
 
-**GPU track (106 AIFS forecasts left):**
+1. **Resumed on H100 SXM** (new port, same volume in US-MO-1, RunPod Pytorch 2.8.0 template). Env fully intact: torch 2.8.0+cu128, flash_attn 2.8.3, earth2studio 0.14.0, anemoi.inference 0.11.0 (the pin from 2026-05-27 stuck).
+2. **Launched the full 106-forecast batch in the background** via `scripts/04_run_forecasts.py` (no `--limit`). nohup'd so it survives SSH disconnects. Per-forecast wall clock running ~2-3.5 min, on pace for ~5.5 hr total.
+3. **Wrote `scripts/04b_ingest_aifs.py`** — idempotent sweep that reads trimmed AIFS NetCDFs from `data/forecasts/`, accumulates each to an IMD-day total, regrids to the common 0.25° grid, and writes the `aifs` variable into the master Zarr store. Validates against script 02 output (2025-07-15 mean=8.88 mm/day, byte-identical).
+4. **scp'd 21 trimmed AIFS NetCDFs from pod to laptop** (filter: <50 MB, idle ≥2 min, to skip in-progress 7 GB writes). Ran the sweep → **21/122 AIFS days populated** in the local Zarr alongside the existing 121 IMERG + 121 ERA5.
+5. **Implemented `analysis/bias.py`** — five non-deferred diagnostics: `mean_bias_map`, `rmse_map`, `bias_by_region`, `bias_by_elevation`, `bias_by_rainfall_magnitude`. Each accepts a forecast/observed pair so the same code computes AIFS−IMERG, ERA5−IMERG, and the AIFS−ERA5 residual.
+6. **Verified `data/elevation.py` was already implemented** (STATUS.md previously misclassified as stub). NOAA ETOPO 2022 60-arc-sec → regridded to 0.25°. Mumbai 23 m, Delhi 222 m, Himalaya (30N, 80E) 1987 m — all sensible.
+7. **Implemented `analysis/plots.py`** — seven plot functions: bias map (`cmocean.balance`), RMSE map (`cmocean.amp`), three-panel decomposition, region bar chart, elevation-bin bar chart, bias-vs-elevation hexbin scatter, rainfall-magnitude bar chart. BSISO panel remains deferred.
+8. **Wrote `scripts/05_compute_bias.py` + `scripts/06_make_plots.py`** as thin orchestrators. End-to-end smoke against the 21-day cube produces 8 NetCDFs under `outputs/bias/` and 7 PNGs under `outputs/figures/`.
 
-1. Resume H100 SXM pod, attach same volume in US-MO-1.
-2. `cd /workspace/proto-1 && uv run python scripts/04_run_forecasts.py --limit N` — pick `N` from your budget at ~3 min/forecast.
-3. Remaining 106 forecasts × ~3 min ≈ **5–6 hr on H100 SXM, ~$17**. Splittable across multiple sessions; script 04 is resumable.
+### What the partial cube already shows
 
-**Laptop track (analysis pipeline, no GPU):**
+Three diagnostic findings from just 21 days (early-monsoon, Jun 1–20 + the 07-15 cached date):
 
-1. **AIFS → Zarr sweep** (~50 LoC, new script or extension of script 03). Pull the trimmed AIFS NetCDFs from the pod (`scp ... data/forecasts/*.nc`), read each, accumulate to IMD-day (`accumulate.accumulate_aifs_to_imd_day`), regrid (`regrid.regrid_precip`), write to Zarr (`store.write_day(..., aifs=...)`).
-2. **`data/elevation.py`** (~50 LoC): download ETOPO1, coarsen to 0.25°.
-3. **`analysis/bias.py`** (~150 LoC): the six stub functions are well-specified by docstrings + `config.REGIONS` / `ELEVATION_BINS_M` / `RAINFALL_BINS_MM`. Cheapest land mask: treat IMERG-NaN as ocean.
-4. **`analysis/plots.py` + `scripts/05` + `scripts/06`** (~300 LoC): six figures via cartopy + cmocean, thin orchestrators in 05/06.
+1. **Rainfall-magnitude tail miscalibration (the smoking gun).** AIFS over-predicts trace (+1.99 mm/day) and light (+3.52) rain, then under-predicts moderate (−4.48), heavy (−27.47), and very-heavy (−75.44 mm/day). Sample count remains substantial in the heavy tail (n=12,398 / n=4,080). This is the canonical AI-weather-model failure: a narrower precip distribution than reality.
+2. **Orographic bias.** Western Ghats windward face dry (−1.34), leeward wet (+1.27); Himalayan foothills wet (+1.73); plains slightly dry (−1.75); higher elevations consistently wet (+1.36 to +2.50). ERA5 shows the same shape with smaller magnitude.
+3. **AIFS−ERA5 residual has its own structure** (3-panel figure, right panel). Not random — AIFS departs from its training distribution in spatially structured ways.
 
-Bias maps will be partial until all 122 AIFS forecasts are in (currently 16/122). But the analysis modules can be developed + smoke-tested against the partial cube — `mean_bias_map(aifs - imerg)` works on any subset of populated days.
+All three patterns are exactly the kind of structured, learnable bias the prototype was set up to test for. This validates the project's precondition: **bias has learnable structure → a corrective head is justified.**
+
+### Pod state during this session
+
+```
+data/forecasts/      ~16+(N batch-completed) AIFS NetCDFs, all trimmed to ~37 MB each
+logs/b3_full_*.log   batch progress log (per-forecast lines)
+/tmp/b3.pid          batch PID
+```
+
+`/workspace/proto-1` is still not a git checkout; we sync code edits with `scp`. Cleanup item.
+
+### Cost this session: ~$18 estimated when batch finishes (~5.5 hr × $3.29/hr). Cumulative ~$32.
+
+## Resume checklist (paused 2026-05-28 PM, pod stopped)
+
+### Where things were when the session ended
+
+- Batch was alive on the pod at `[N/106]` (check `tail logs/b3_full_*.log` to find the exact stopping point). Resume with `scripts/04_run_forecasts.py` (no `--limit`) — it skips already-completed forecasts.
+- Local Zarr had 121 IMERG + 121 ERA5 + (21 + however many batch completions were synced) AIFS days.
+
+### Next steps
+
+1. **Resume pod**, verify env probe, kick off `scripts/04_run_forecasts.py` again to finish whatever wasn't done last time.
+2. **scp the new trimmed AIFS NetCDFs** to the laptop:
+   ```bash
+   ssh ... 'find /workspace/proto-1/data/forecasts -name "aifs_*.nc" -size -50M -not -name "*.trimmed.nc" -printf "%f\n"' \
+     | rsync --files-from=- ... root@...:/workspace/proto-1/data/forecasts/ data/forecasts/
+   ```
+3. **`uv run python scripts/04b_ingest_aifs.py`** — idempotent, populates new days into the local Zarr.
+4. **`uv run python scripts/05_compute_bias.py && uv run python scripts/06_make_plots.py`** — regenerates the 8 NetCDFs + 7 PNGs against the now-fuller cube.
+5. **Compare full-122 figures to the 21-day partial snapshot** in `outputs/figures/`. The three structural findings (rainfall-magnitude tail, orography, residual) should sharpen, not invert; if any flip sign, it's worth investigating.
+
+### Long-tail / nice-to-have
+
+- **Land mask.** Currently no mask applied; plots include ocean cells. Cheapest fix: use `cartopy.feature.OCEAN` or compute a binary from ETOPO ≥ 0 m to mask out bathymetry-clipped ocean. Add as a `bias.land_mask(grid) → DataArray[bool]` helper.
+- **Pod git checkout.** `/workspace/proto-1` is still a rsync tree. Convert via `git init && git remote add origin ... && git fetch && git checkout origin/main -- .` (destructive — overwrites tracked files, untracked data/ and .venv survive). Lets us `git pull` instead of scp.
+- **BSISO stratification.** Self-compute from NOAA OLR + IPRC EEOF vectors per Kikuchi 2012. ~150 LoC. The plotting layer (`plot_bias_by_bsiso`) is stubbed and ready.
 
 ## Stack snapshot
 
